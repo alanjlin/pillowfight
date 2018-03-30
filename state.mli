@@ -1,3 +1,5 @@
+open Actors
+open Collisions
 
 (* The [state] of the game represents all the variables and information
  * necessary for any instance of gameplay. [state] is essential in
@@ -10,25 +12,25 @@ module type State = sig
   type state
 
   (* Returns: a list of girl objects. *)
-  val girls: state -> girl list
+  val girls: state -> Actors.girl list
 
   (* Returns: a list of pillows currently on the map*)
-  val pillows: state -> pillow list
+  val pillows: state -> Actors.pillow list
 
   (* Returns: the professor in the game. *)
-  val prof: state -> prof
+  val prof: state -> Actors.people
 
   (* Returns: the bed object*)
-  val bed: state -> bed
+  val bed: state -> Actors.furniture
 
   (* Returns: the walls, or "parameters" of the game.*)
-  val walls: state -> wall list
+  val walls: state -> Actors.furniture list
 
   (* Returns: a list of collisions that are taking place in [state]*)
-  val collisions: state -> collisions list
+  val collisions: state -> Collision.collision list
 
   (* Returns: An association list with each girl and her score.*)
-  val scores: state -> (girl * int) list
+  val scores: state -> (Actors.girl * int) list
 
   (* Returns: the global timer in the game before game ends.*)
   val time: state -> float
