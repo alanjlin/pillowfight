@@ -17,7 +17,7 @@ val load_screen : unit -> unit
 *)
 val init_display : unit -> unit
 
-(* effects: [update_display st] update sthe display based on the new information received
+(* effects: [update_display st] updates the display based on the new information received
    from the state. For example, if the state indicates a collision between
    two girls, then the display will be updated accordingly to make sure
    one sprite is on top of the other. Another example: the timer will be updated
