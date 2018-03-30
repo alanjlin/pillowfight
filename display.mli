@@ -3,6 +3,7 @@
    they are purely "side effects" from our current understanding of our project
 *)
 module type Display = sig
+   open State
   (* [load_screen] will display the initial menu that players see when they
    first open the game. *)
 val load_screen : unit -> unit
@@ -23,7 +24,7 @@ val init_display : unit -> unit
    one sprite is on top of the other. Another example: the timer will be updated
    every second as the game progresses
   returns: nothing*)
-val update_display: state -> unit
+val update_display: State.state -> unit
 
 (* effects: [game_over_display] will be called once the game is over and show the screen
    that shows 1st, 2nd, and 3rd place, as well as a button to go back to the main
