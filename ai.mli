@@ -1,6 +1,7 @@
-(* this module will be used to give functionality and define behavior for the
+(* [ai] will be used to give functionality and define behavior for the
    characters not controlled by human players, i.e. the AI. *)
 
+module type AI = sig
 (* this function will take in a state [st] and a reference point girl [g1] and
    return the girl [g2] who is closest in distance to [g1],
    excluding [g1] herself. *)
@@ -13,8 +14,7 @@ val nearest_girl : state -> girl -> girl
 *)
 val nearest_pillow: state -> girl -> pillow
 
-(* this function will take in a state [st] and an AI-controlled girl [g1] and
-   assign the girl what to do based on her current actions in state.
+(* [do' st g1 ] assigns girl [g1] what to do based on her current actions in [st].
    - If [g1] does not have a pillow, then she will find the nearest pillow and
    go towards it. If there are currently no pillows on the map, she will do
    nothing.
@@ -22,3 +22,4 @@ val nearest_pillow: state -> girl -> pillow
    she will find the nearest girl and go towards that girl to throw the pillow.
 *)
 val do': state -> girl -> state
+end
