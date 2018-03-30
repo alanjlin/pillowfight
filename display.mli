@@ -2,8 +2,9 @@
    for all objects. Many of these functions have type (unit -> unit) because
    they are purely "side effects" from our current understanding of our project
 *)
+open State
+
 module type Display = sig
-   open State
   (* [load_screen] will display the initial menu that players see when they
    first open the game. *)
 val load_screen : unit -> unit
