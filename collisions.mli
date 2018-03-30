@@ -2,7 +2,7 @@ open State
 open Actors
 
 module type Collisions = sig
-  (* invariant representing the types of collisions *)
+  (* variant representing the types of collisions *)
   type collision =
     | GirlOnGirl
     | GirlOnBed
