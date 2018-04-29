@@ -11,6 +11,8 @@ module type State = sig
    * required to run the game. Perhaps a record would be good.*)
   type state
 
+  (* The following methods are accessors *)
+
   (* Returns: a list of girl objects. *)
   val girls: state -> Actors.girl list
 
