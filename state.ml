@@ -9,21 +9,19 @@ type move = {
 }
 
 type collision =
-  | GirlOnGirl of girl*girl
   | GirlOnWall of girl*furniture
   | GirlOnPillow of girl*pillow
   | PillowOnGirl of pillow*girl
 
-
 type st = {
-  bloom: girl;
-  soap: girl;
-  mcup: girl;
-  pillows: pillow list;
+  mutable bloom: girl;
+  mutable soap: girl;
+  mutable mcup: girl;
+  mutable pillows: pillow list;
   walls: furniture list;
-  collisions: collision list;
-  scores: (girl * int) list;
-  time: float;
+  mutable collisions: collision list;
+  mutable scores: (girl * int) list;
+  mutable time: float;
 }
 
 let player_keys = {
@@ -33,8 +31,6 @@ let player_keys = {
   right = false;
   space = false;
 }
-
-let girls (s: st) = s.girls
 
 let pillows s = s.pillows
 
@@ -46,10 +42,29 @@ let scores s = s.scores
 
 let time s = s.time
 
+(* Checks if a given set of coordinates fits within a 400x400 square. *)
+let is_in_bounds coord : bool =
+  if fst coord >= 0 && fst coord <= 400
+     && snd coord >= 0 && snd coord <= 400 then true else false
+
+(* helper function for update, checks for user press of keys and updates
+ * corresponding movement. *)
+let update_pmovement girl keys =
+  if is_in_bounds girl.coordinate then
+    if keys.up then girl.direction <- 1;
+  let c = girl.coordinate in girl.coordinate <- (fst c + girl.move_speed, snd c)
+    else if keys.down then girl.direction <- 3;
+  let c = girl.coordinate in girl.coordinate <- (fst c - girl.move_speed, snd c)
+    else if keys.left then girl.direction <- 4;
+  let c = girl.coordinate in girl.coordinate <- (fst c, snd c - girl.move_speed)
+    else if keys.right then girl.direction <- 2;
+  let c = girl.coordinate in girl.coordinate <- (fst c, snd c + girl.move_speed)
+    else ()
+  else ()
+
 let update s = failwith "unimplemented"
 
 let move_handler m s = failwith "unimplemented"
-
 
     (**)
 let rec remove_pillow it plst =
@@ -61,45 +76,73 @@ let rec remove_pillow it plst =
         if it = i then remove_pillow it t
         else (Regular i)::(remove_pillow it t)
 
-
 (* effects: [collisionHandler cl st] updates the state depending on the collision.
    For example, if a girl collides with a pillow, the state should be updated
    with the girl holding the pillow. Another example: when the girls collides
    with the bed, the girl should slow down.
    returns: the updated state *)
-(* let collisionHandler c s =
+let collisionHandler c s =
   match c with
-  | GirlOnPillow g, p ->
+  | GirlOnPillow (g,p) ->
     begin match g with
       | Bloom i ->
         if i.has_pillow then s
         else
-          i.has_pillow <- true;
-          s.bloom <- Bloom of i;
+          let _ = i.has_pillow <- true in
+          let _ = s.bloom <- Bloom i in
           begin match p with
-            | Regular of i -> s <- (remove_pillow i s.pillows); s
+            | Regular i -> s.pillows <- (remove_pillow i s.pillows); s
           end
-      | Soap of i ->
+      | Soap i ->
         if i.has_pillow then s
         else
-          i.has_pillow <- true;
-          s.soap <- Soap of i;
+          let _ = i.has_pillow <- true in
+          let _ = s.soap <- Soap i in
           begin match p with
-            | Regular of i -> s <- (remove_pillow i s.pillows); s
+            | Regular i -> s.pillows <- (remove_pillow i s.pillows); s
           end
-      | Margarinecup of i ->
+      | Margarinecup i ->
         if i.has_pillow then s
         else
-          i.has_pillow <- true;
-          s.icbinbc <- Margarinecup of i;
+          let _ = i.has_pillow <- true in
+          let _ = s.soap <- Soap i in
           begin match p with
-            | Regular of i -> s <- (remove_pillow i s.pillows); s
+            | Regular i -> s.pillows <- (remove_pillow i s.pillows); s
           end
     end
-  | PillowOnGirl p, g ->
-  | GirlOnWall g, w ->
+  | PillowOnGirl (p, g)->
+    begin match p with
+      | Regular p_info ->
+        let fs = p_info.fly_speed in
+        let dir = p_info.direction in
+        begin match g with
+          | Bloom i ->
+            let _ = i.fly_speed <- fs in
+            let _ = i.direction <- dir in
+            let _ = s.bloom <- Bloom i in
+            s
+          | Soap i ->
+            let _ = i.fly_speed <- fs in
+            let _ = i.direction <- dir in
+            let _ = s.soap <- Soap i in s
+          | Margarinecup i ->
+            let _ = i.fly_speed <- fs in
+            let _ = i.direction <- dir in
+            let _ = s.mcup <- Margarinecup i in s
+        end
+    end
+  | GirlOnWall (g, w) ->
     begin match g with
-      | Bloom i -> *)
+      | Bloom i ->
+        let _ = i.fly_speed <= 0 in
+        let _ = s.bloom = Bloom i in s
+      | Soap i ->
+        let _ = i.fly_speed <= 0 in
+        let _ = s.soap = Soap i in s
+      | Margarinecup i ->
+        let _ = i.fly_speed <= 0 in
+        let _ = s.mcup = Margarinecup i in s
+    end
 
 
 let isColliding o1 o2 = failwith "unimplemented"
