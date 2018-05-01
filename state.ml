@@ -74,7 +74,7 @@ let collisionHandler c s =
           let _ = i.has_pillow <- true in
           let _ = s.bloom <- Bloom i in
           begin match p with
-            | Regular of i -> s.pillows <- (remove_pillow i s.pillows); s
+            | Regular i -> s.pillows <- (remove_pillow i s.pillows); s
           end
       | Soap i->
         if i.has_pillow then s
