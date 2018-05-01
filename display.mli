@@ -29,3 +29,5 @@ val update_display: State.st -> unit
  menu, etc.
 returns: nothing*)
 val game_over_display : unit -> unit
+
+val draw_state: Dom_html.canvasRenderingContext2D Js.t -> State.st -> unit
