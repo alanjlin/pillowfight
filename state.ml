@@ -205,8 +205,7 @@ let collisionHandler c s =
 
 let isColliding o1 o2 = failwith "unimplemented"
 
-let rec update_all canvas =
-  let context = canvas.getContext in
+let rec update_all getContext =
   let loop st =
     let st' = update_st st in
     Display.draw_state context st';
