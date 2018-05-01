@@ -1,5 +1,5 @@
+S src
 B _build
-PKG oUnit
+PKG js_of_ocaml
 PKG yojson
-PKG str
-PKG ANSITerminal
+PKG oUnit
