@@ -112,9 +112,9 @@ let update_pmovement (girl:Actors.info) keys =
   else ()
 
 let update_st s =
-      match s.mcup with
-      | Margarinecup m -> let _ =  update_pmovement m player_keys in s
-      | _ -> s
+    match s.mcup with
+    | Margarinecup m -> let _ =  update_pmovement m player_keys in s
+    | _ -> s
 
 let move_handler m s = failwith "unimplemented"
 
@@ -212,12 +212,12 @@ let collisionHandler c s =
 let isColliding o1 o2 = failwith "unimplemented"
 
 let rec update_all context =
-  let loop st =
+  let rec loop st =
     let st' = update_st st in
     Display.draw_state context st';
-    ignore Html.window##requestAnimationFrame(
+    ignore (Html.window##requestAnimationFrame(
       Js.wrap_callback (fun (t:float) -> loop st')
-    )
+    ))
 in loop init_st
 
 (* Keydown event handler translates a key press *)
