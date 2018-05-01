@@ -25,7 +25,7 @@ type st = {
   mutable time: float;
 }
 
-let pressed_keys = {
+let player_keys = {
   up = false;
   down = false;
   left = false;
@@ -130,22 +130,23 @@ let collisionHandler c s =
 let isColliding o1 o2 = failwith "unimplemented"
 
 (* Keydown event handler translates a key press *)
-let keydown evt =
-  let () = match evt##keyCode with
-  | 38 | 32 | 87 -> pressed_keys.up <- true
-  | 39 | 68 -> pressed_keys.right <- true
-  | 37 | 65 -> pressed_keys.left <- true
-  | 40 | 83 -> pressed_keys.down <- true
-  | 66 -> pressed_keys.bbox <- (pressed_keys.bbox + 1) mod 2
+let keydown event =
+  let () = match event##keyCode with
+  | 38 -> player_keys.up <- true
+  | 39 -> player_keys.right <- true
+  | 37 -> player_keys.left <- true
+  | 40 -> player_keys.down <- true
+  | 32 -> player_keys.space <- true
   | _ -> ()
   in Js._true
 
 (* Keyup event handler translates a key release *)
-let keyup evt =
-  let () = match evt##keyCode with
-  | 38 | 32 | 87 -> pressed_keys.up <- false
-  | 39 | 68 -> pressed_keys.right <- false
-  | 37 | 65 -> pressed_keys.left <- false
-  | 40 | 83 -> pressed_keys.down <- false
+let keyup event =
+  let () = match event##keyCode with
+  | 38 -> player_keys.up <- false
+  | 39 -> player_keys.right <- false
+  | 37 -> player_keys.left <- false
+  | 40 -> player_keys.down <- false
+  | 32 -> player_keys.space <- false
   | _ -> ()
   in Js._true
