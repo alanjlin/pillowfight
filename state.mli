@@ -59,4 +59,10 @@ val move_handler : move -> st -> st
    with the girl holding the pillow. Another example: when the girls collides
    with the bed, the girl should slow down.
   returns: the updated state *)
-  val collisionHandler: collision -> st -> st
+val collisionHandler: collision -> st -> st
+
+val update_all: Dom_html.canvasRenderingContext2D Js.t -> unit
+
+val keydown: Dom_html.keyboardEvent Js.t -> bool Js.t
+
+val keyup: Dom_html.keyboardEvent Js.t -> bool Js.t 
