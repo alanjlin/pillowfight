@@ -66,7 +66,19 @@ let update s = failwith "unimplemented"
 
 let move_handler m s = failwith "unimplemented"
 
-    (**)
+
+
+
+
+(*[collision_detector s] determines whether there is a collision given the
+  information of the two objects. returns true if there is a collision, false
+otherwise. *)
+let collision_detector i1 i2 = failwith "unimplemented"
+
+
+(*[remove_pillow it plst] removes the pillow with info it from plst, if it is
+  found in the list, if not found, returns the original plst (helper method
+  for collision handler)*)
 let rec remove_pillow it plst =
   match plst with
   | [] -> []
