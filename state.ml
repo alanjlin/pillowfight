@@ -62,7 +62,16 @@ let update s = failwith "unimplemented"
 
 let move_handler m s = failwith "unimplemented"
 
-    (**)
+
+
+
+
+(*[collision_detector s] *)
+let collision_detector s =
+  let bloom_c =
+
+(*[remove_pillow it plst] removes the pillow with info it from plst, if it is
+found in the list, if not found, returns the original plst*)
 let rec remove_pillow it plst =
   match plst with
   | [] -> []
