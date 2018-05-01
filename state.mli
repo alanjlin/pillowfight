@@ -1,5 +1,4 @@
 open Actors
-
 (* The [state] of the game represents all the variables and information
 * necessary for any instance of gameplay. [state] is essential in
 * gameplay because it is responsible for keeping track of every
@@ -8,13 +7,20 @@ open Actors
 
 (* The implementation of type will serve to store all information
  * required to run the game. Perhaps a record would be good.*)
-type st
+ type collision =
+   | GirlOnWall of girl * furniture
+   | GirlOnPillow of girl * pillow
+   | PillowOnGirl of pillow * girl
 
-type collision =
-  | GirlOnGirl
-  | GirlOnWall
-  | GirlOnPillow
-  | PillowOnGirl
+type st = {
+  mutable bloom: girl;
+  mutable soap: girl;
+  mutable mcup: girl;
+  mutable pillows: pillow list;
+  mutable collisions: collision list;
+  mutable scores: (string * int) list;
+  mutable time: float;
+}
 
   (* Controls correspond to keyboard input *)
   type move = Space | Left | Right | Up | Down
@@ -65,4 +71,4 @@ val update_all: Dom_html.canvasRenderingContext2D Js.t -> unit
 
 val keydown: Dom_html.keyboardEvent Js.t -> bool Js.t
 
-val keyup: Dom_html.keyboardEvent Js.t -> bool Js.t 
+val keyup: Dom_html.keyboardEvent Js.t -> bool Js.t
