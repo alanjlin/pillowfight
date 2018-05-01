@@ -9,7 +9,7 @@ module type Actors = sig
     direction: int; (*no direction = 0; up = 1; right = 2; down = 3; left = 4*)
     coordinate: int * int;
     hitbox: (int * int) list;
-    has_pillow: bool;
+    has_pillow: bool
   }
 
   (* variant representing the types of girl *)

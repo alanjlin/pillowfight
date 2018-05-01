@@ -9,9 +9,9 @@ type move = {
 }
 
 type collision =
-  | GirlOnWall of girl*furniture
-  | GirlOnPillow of girl*pillow
-  | PillowOnGirl of pillow*girl
+  | GirlOnWall of girl * furniture
+  | GirlOnPillow of girl * pillow
+  | PillowOnGirl of pillow * girl
 
 type st = {
   mutable bloom: girl;
@@ -32,6 +32,40 @@ let player_keys = {
   space = false;
 }
 
+let init_st = {
+  bloom = ref {
+    move_speed = ref 1;
+    fly_speed = ref 0;
+    throw_power = 1;
+    recovery_time = 3;
+    direction = ref 1;
+    coordinate = ref (0, 0);
+    has_pillow = ref false;
+  };
+  soap = ref {
+      move_speed = ref 1;
+      fly_speed = ref 0;
+      throw_power = 1;
+      recovery_time = 3;
+      direction = ref 1;
+      coordinate = ref (0, 0);
+      has_pillow = ref false;
+  };
+  mcup = ref {
+      move_speed = ref 1;
+      fly_speed = ref 0;
+      throw_power = 1;
+      recovery_time = 3;
+      direction = ref 1;
+      coordinate = ref (0, 0);
+      has_pillow = ref false;
+    };
+  pillows = ref [];
+  collisions = ref [];
+  scores = ref [(bloom, 0); (soap, 0); (mcup, 0)];
+  time = ref 0.
+}
+
 let pillows s = s.pillows
 
 let walls s = s.walls
@@ -41,6 +75,18 @@ let collisions s = s.collisions
 let scores s = s.scores
 
 let time s = s.time
+
+
+
+let last_time = ref (Unix.gettimeofday ())
+
+(* [Requires]: lt is [last_time]
+ * [Returns]: Difference between current time and last time. *)
+let get_time_diff lt =
+   (Unix.gettimeofday ()) -. !lt
+
+(* [Effects]: Changes last time to current time. *)
+let reset_last_time lt = lt := Unix.gettimeofday ()
 
 (* Checks if a given set of coordinates fits within a 400x400 square. *)
 let is_in_bounds coord : bool =
@@ -62,7 +108,7 @@ let update_pmovement girl keys =
     else ()
   else ()
 
-let update s = failwith "unimplemented"
+let update_st s = let _ = update_pmovement s.mcup player_keys in s
 
 let move_handler m s = failwith "unimplemented"
 
@@ -146,6 +192,16 @@ let collisionHandler c s =
 
 
 let isColliding o1 o2 = failwith "unimplemented"
+
+let rec update_all canvas =
+  let context = canvas.getContext in
+  let loop st =
+    let st' = update_st st in
+    Display.draw_state context st';
+    ignore Html.window##requestAnimationFrame(
+      Js.wrap_callback (fun (t:float) -> loop st')
+    )
+in loop init_st
 
 (* Keydown event handler translates a key press *)
 let keydown event =

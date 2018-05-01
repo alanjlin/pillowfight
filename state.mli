@@ -1,3 +1,5 @@
+open Actors
+
 (* The [state] of the game represents all the variables and information
 * necessary for any instance of gameplay. [state] is essential in
 * gameplay because it is responsible for keeping track of every
@@ -20,11 +22,8 @@ type collision =
 
 (* The following methods are accessors *)
 
-(* Returns: a list of girl objects. *)
-val girls: st -> Actors.girl list
-
 (* Returns: a list of pillows currently on the map*)
-val pillows: st -> Actors.pillow list
+val pillows: st -> pillow list
 
 (* Returns: the professor in the game. *)
 (* val prof: state -> Actors.people *)
@@ -33,13 +32,13 @@ val pillows: st -> Actors.pillow list
 (* val bed: state -> Actors.furniture *)
 
 (* Returns: the walls, or "parameters" of the game.*)
-val walls: st -> Actors.furniture list
+val walls: st -> furniture list
 
 (* Returns: a list of collisions that are taking place in [state]*)
 val collisions: st -> collision list
 
 (* Returns: An association list with each girl and her score.*)
-val scores: st -> (Actors.girl * int) list
+val scores: st -> (girl * int) list
 
 (* Returns: the global timer in the game before game ends.*)
 val time: st -> float
