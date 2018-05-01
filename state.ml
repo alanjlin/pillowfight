@@ -9,7 +9,6 @@ type move = {
 }
 
 type collision =
-  | GirlOnGirl of girl*girl
   | GirlOnWall of girl*furniture
   | GirlOnPillow of girl*pillow
   | PillowOnGirl of pillow*girl
@@ -32,8 +31,6 @@ let player_keys = {
   right = false;
   space = false;
 }
-
-let girls (s: st) = s.girls
 
 let pillows s = s.pillows
 
@@ -66,7 +63,7 @@ let rec remove_pillow it plst =
    returns: the updated state *)
 let collisionHandler c s =
   match c with
-  | GirlOnPillow g, p ->
+  | GirlOnPillow (g,p) ->
     begin match g with
       | Bloom i ->
         if i.has_pillow then s
@@ -76,24 +73,24 @@ let collisionHandler c s =
           begin match p with
             | Regular i -> s.pillows <- (remove_pillow i s.pillows); s
           end
-      | Soap i->
+      | Soap i ->
         if i.has_pillow then s
         else
           let _ = i.has_pillow <- true in
-          let _ = s.soap <- Soap of i in
+          let _ = s.soap <- Soap i in
           begin match p with
-            | Regular of i -> s.pillows <- (remove_pillow i s.pillows); s
+            | Regular i -> s.pillows <- (remove_pillow i s.pillows); s
           end
       | Margarinecup i ->
         if i.has_pillow then s
         else
           let _ = i.has_pillow <- true in
-          let _ = s.soap <- Soap of i in
+          let _ = s.soap <- Soap i in
           begin match p with
-            | Regular of i -> s.pillows <- (remove_pillow i s.pillows); s
+            | Regular i -> s.pillows <- (remove_pillow i s.pillows); s
           end
     end
-  | PillowOnGirl p, g ->
+  | PillowOnGirl (p, g)->
     begin match p with
       | Regular p_info ->
         let fs = p_info.fly_speed in
@@ -102,28 +99,29 @@ let collisionHandler c s =
           | Bloom i ->
             let _ = i.fly_speed <- fs in
             let _ = i.direction <- dir in
-            s.bloom <- Bloom i
+            let _ = s.bloom <- Bloom i in
+            s
           | Soap i ->
             let _ = i.fly_speed <- fs in
             let _ = i.direction <- dir in
-            s.soap <- Soap i
+            let _ = s.soap <- Soap i in s
           | Margarinecup i ->
             let _ = i.fly_speed <- fs in
             let _ = i.direction <- dir in
-            s.mcup <- Margarinecup i
+            let _ = s.mcup <- Margarinecup i in s
         end
     end
-  | GirlOnWall g, w ->
+  | GirlOnWall (g, w) ->
     begin match g with
       | Bloom i ->
         let _ = i.fly_speed <= 0 in
-        s.bloom = Bloom i
+        let _ = s.bloom = Bloom i in s
       | Soap i ->
         let _ = i.fly_speed <= 0 in
-        s.soap = Soap i
+        let _ = s.soap = Soap i in s
       | Margarinecup i ->
         let _ = i.fly_speed <= 0 in
-        s.mcup = Margarinecup i
+        let _ = s.mcup = Margarinecup i in s
     end
 
 
