@@ -42,6 +42,22 @@ let scores s = s.scores
 
 let time s = s.time
 
+(* Checks if a given set of coordinates fits within a 400x400 square. *)
+let is_in_bounds coord : bool =
+  if fst coord >= 0 && fst coord <= 400
+     && snd coord >= 0 && snd coord <= 400 then true else false
+
+(* helper function for update, checks for user press of keys and updates
+ * corresponding movement. *)
+let update_pmovement girl keys =
+  if is_in_bounds girl.coordinate then
+    if keys.up then girl.direction <- 1
+    else if keys.down then girl.direction <- 3
+    else if keys.left then girl.direction <- 4
+    else if keys.right then girl.direction <- 2
+    else ()
+  else ()
+
 let update s = failwith "unimplemented"
 
 let move_handler m s = failwith "unimplemented"
