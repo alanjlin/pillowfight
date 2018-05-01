@@ -61,8 +61,3 @@ val move_handler : move -> st -> st
    with the bed, the girl should slow down.
   returns: the updated state *)
   val collisionHandler: collision -> st -> st
-
-(* effects: [isColliding ob1 ob2] checks if two objects [ob1] and [ob2] are
-    colliding or not.
-    returns: true if [ob1] and [ob2] are colliding, and false otherwise *)
-  val isColliding: Actors.obj -> Actors.obj -> bool
