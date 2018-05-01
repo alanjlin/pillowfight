@@ -1,19 +1,17 @@
+
 type info = {
-  max_speed: int;
-  throw_power: int;
+  move_speed: int; (*only applies to girls, when player moving*)
+  fly_speed: int; (*speed of projectiles*)
+  throw_power: int; (**)
   recovery_time: int;
-  direction: int;
+  direction: int; (*no direction = 0; up = 1; right = 2; down = 3; left = 4*)
   coordinate: int * int;
   hitbox: (int * int) list;
-  layer: int;
+  has_pillow: bool;
 }
 
 type girl = Bloom of info | Soap of info | Margarinecup of info
 
-type people = Professor| Girl
+type furniture = Walls of info
 
-type furniture = Bed | Walls
-
-type pillow = Regular | Hard | Repeating
-
-type obj = People | Furniture | Pillow
+type pillow = Regular of info

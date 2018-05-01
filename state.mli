@@ -10,10 +10,7 @@ type st
 
 type collision =
   | GirlOnGirl
-  | GirlOnBed
   | GirlOnWall
-  | GirlOnProfessor
-  | PillowOnProfessor
   | GirlOnPillow
   | PillowOnGirl
 
