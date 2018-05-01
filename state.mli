@@ -50,7 +50,7 @@ val time: st -> float
 (* The REPL that updates the game state after every frame.
  * Checks for statuses of many game methods, increments time, keeps
  * track of score, collisions, girl positions, professor, pillows.*)
-val update: st -> st
+val update_st: st -> st
 
 (*[move_handler m s] is the new state produced after a move m is processed on
   state s the new state represents new state regardless of whether the move was
