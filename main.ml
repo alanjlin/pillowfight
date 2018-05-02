@@ -21,4 +21,4 @@ let initialize _ =
       (Dom_html.handler State.keydown) _true in
   let _ = Dom_html.addEventListener Dom_html.document Dom_html.Event.keyup
       (Dom_html.handler State.keyup) _true in
-  update_all context
+  update_all context;
