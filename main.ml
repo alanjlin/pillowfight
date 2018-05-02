@@ -12,3 +12,12 @@ let initialize _ =
   let _ = Dom_html.addEventListener Dom_html.document Dom_html.Event.keyup
       (Dom_html.handler State.keyup) _true in
   State.update_all context
+
+  let rec update_all context =
+    let rec loop st =
+      let st' = State.update_st st in
+      Display.draw_state context st';
+      ignore (Html.window##requestAnimationFrame(
+        Js.wrap_callback (fun (t:float) -> loop st')
+      ))
+  in loop State.init_st

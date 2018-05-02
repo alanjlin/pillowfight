@@ -22,9 +22,13 @@ type st = {
   mutable time: float;
 }
 
-  (* Controls correspond to keyboard input *)
-  type move = Space | Left | Right | Up | Down
-
+type move = {
+  mutable up: bool;
+  mutable down: bool;
+  mutable left: bool;
+  mutable right: bool;
+  mutable space: bool;
+}
 
 (* The following methods are accessors *)
 
@@ -37,14 +41,11 @@ val pillows: st -> pillow list
 (* Returns: the bed object*)
 (* val bed: state -> Actors.furniture *)
 
-(* Returns: the walls, or "parameters" of the game.*)
-val walls: st -> furniture list
-
 (* Returns: a list of collisions that are taking place in [state]*)
 val collisions: st -> collision list
 
 (* Returns: An association list with each girl and her score.*)
-val scores: st -> (girl * int) list
+val scores: st -> (string * int) list
 
 (* Returns: the global timer in the game before game ends.*)
 val time: st -> float
@@ -72,3 +73,5 @@ val update_all: Dom_html.canvasRenderingContext2D Js.t -> unit
 val keydown: Dom_html.keyboardEvent Js.t -> bool Js.t
 
 val keyup: Dom_html.keyboardEvent Js.t -> bool Js.t
+
+val init_st: st

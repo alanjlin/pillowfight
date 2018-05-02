@@ -1,3 +1,4 @@
+open State
 
 module Html = Dom_html
 let js = Js.string
@@ -17,7 +18,7 @@ the sprite *)
 let draw_actor context =
   let img = (Dom_html.createImg Dom_html.document) in
   img##src <- (Js.string "./pics/sprite.png");
-  context##drawImage_full(img, 0, 0, 20, 20, 200, 200, 20, 20);
+  context##drawImage_full(img, 0., 0., 20., 20., 200., 200., 20., 20.)
 
 (* [draw_bg context] draws the background *)
 let draw_bg context =
@@ -28,9 +29,9 @@ let draw_bg context =
      dx = 0, dy = 0, dWidth = 400, dHeight = 400,
      bg name = background.png
   *)
-  context##drawImage_full(img, 0, 0, 400, 400, 0, 0, 400, 400)
+  context##drawImage_full(img, 0., 0., 400., 400., 0., 0., 400., 400.)
 
-(* [draw_state context state] currently hard-coded to actor and bg *)
-let draw_state context state =
+(* [draw_state context state] currently hard-coded to work with  *)
+let draw_state (context: Dom_html.canvasRenderingContext2D Js.t) (state: st) =
   draw_actor context
   draw_bg context
