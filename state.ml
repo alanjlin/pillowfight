@@ -99,17 +99,15 @@ let is_in_bounds coord : bool =
 (* helper function for update, checks for user press of keys and updates
  * corresponding movement. *)
 let update_pmovement (girl:Actors.info) keys =
-  if is_in_bounds girl.coordinate then
-    if keys.up then (girl.direction <- 1;
-                     let c = girl.coordinate in girl.coordinate <- (((fst c) + girl.move_speed), snd c))
-    else if keys.down then (girl.direction <- 3;
+  if keys.up && (snd girl.coordinate >= 0) then (girl.direction <- 1;
+                     let c = girl.coordinate in girl.coordinate <- (fst c, snd c - girl.move_speed))
+  else if keys.down && (snd girl.coordinate <= 400) then (girl.direction <- 3;
+                            let c = girl.coordinate in girl.coordinate <- (fst c, snd c + girl.move_speed))
+  else if keys.left && (fst girl.coordinate >= 0) then (girl.direction <- 4;
                             let c = girl.coordinate in girl.coordinate <- (fst c - girl.move_speed, snd c))
-    else if keys.left then (girl.direction <- 4;
-                            let c = girl.coordinate in girl.coordinate <- (fst c, snd c - girl.move_speed))
-    else if keys.right then (girl.direction <- 2;
-                             let c = girl.coordinate in girl.coordinate <- (fst c, snd c + girl.move_speed))
+  else if keys.right && (fst girl.coordinate <= 400) then (girl.direction <- 2;
+                             let c = girl.coordinate in girl.coordinate <- (fst c + girl.move_speed, snd c))
     else ()
-  else ()
 
 let update_st s =
     match s.mcup with
