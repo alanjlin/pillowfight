@@ -68,7 +68,7 @@ val move_handler : move -> st -> st
   returns: the updated state *)
 val collisionHandler: collision -> st -> st
 
-val update_all: Dom_html.canvasRenderingContext2D Js.t -> unit
+(* val update_all: Dom_html.canvasRenderingContext2D Js.t -> unit *)
 
 val keydown: Dom_html.keyboardEvent Js.t -> bool Js.t
 
