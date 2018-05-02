@@ -10,9 +10,9 @@ let document = Html.document
 let update_draw_actor info context =
   let img = (Dom_html.createImg Dom_html.document) in
   img##src <- (Js.string "./pics/sprite.png");
-  let dx = fst info.coordinate in
-  let dy = snd info.coordinate in
-  context##drawImage_full(img, 0, 0, 20, 20, dx, dy, 20, 20)
+  let dx = float_of_int (fst info.coordinate) in
+  let dy = float_of_int (snd info.coordinate) in
+  context##drawImage_full(img, 0., 0., 20., 20., dx, dy, 20., 20.)
 
 (* [draw_actor context] draws the sprite image. currently hardcoded for just
 the sprite *)
@@ -33,6 +33,9 @@ let draw_bg context =
   context##drawImage_full(img, 0., 0., 400., 400., 0., 0., 400., 400.)
 
 (* [draw_state context state] currently hard-coded to work with  *)
-let draw_state (context: Dom_html.canvasRenderingContext2D Js.t) =
-  draw_actor context;
-  draw_bg context;
+(* We will later need to pass in an argument for which girl. It is hardcoded for now.*)
+let draw_state (context: Dom_html.canvasRenderingContext2D Js.t) state=
+  match state.mcup with
+  | Margarinecup i -> update_draw_actor i context;
+    draw_bg context;
+  | _ -> failwith "not possible"
