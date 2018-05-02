@@ -12,7 +12,7 @@ let rec update_all context =
     ))
 in loop State.init_st
 
-let initialize _ =
+let initialize () =
   let canvas = Opt.get(
       Opt.bind(Dom_html.document##getElementById(string "canvas"))
         Dom_html.CoerceTo.canvas) (fun _ -> assert false) in
@@ -21,4 +21,6 @@ let initialize _ =
       (Dom_html.handler State.keydown) _true in
   let _ = Dom_html.addEventListener Dom_html.document Dom_html.Event.keyup
       (Dom_html.handler State.keyup) _true in
-  update_all context
+  let _ = update_all context in print_endline "hello"
+
+let _ = initialize ()
