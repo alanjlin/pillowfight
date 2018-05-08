@@ -11,9 +11,9 @@ let document = Html.document
 let update_draw_actor info context =
   let img = (Dom_html.createImg Dom_html.document) in
   img##src <- (Js.string "./pics/sprite.png");
-  let dx = fst info.coordinate in
-  let dy = snd info.coordinate in
-  context##drawImage_full(img, 0., 0., 40., 40., dx, dy, 40, 40)
+  let dx = float_of_int (fst info.coordinate) in
+  let dy = float_of_int (snd info.coordinate) in
+  context##drawImage_full(img, 0., 0., 40., 40., dx, dy, 40., 40.)
 
 (* [draw_actor context] draws the sprite image. currently hardcoded for just
 the sprite *)
