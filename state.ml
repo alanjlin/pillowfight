@@ -66,15 +66,38 @@ let update s = failwith "unimplemented"
 
 let move_handler m s = failwith "unimplemented"
 
-
-
-
-
 (*[collision_detector s] determines whether there is a collision given the
   information of the two objects. returns true if there is a collision, false
 otherwise. *)
-let collision_detector i1 i2 = failwith "unimplemented"
+let collision_detector i1 i2 =
+  if i1.fly_speed > 0 then false
+  else
+  match i1.coordinate, i2.coordinate with
+  | (x1, y1), (x2, y2) -> if x1 = x2 && y1 = y2 then true else false
 
+(*[collision_creator g p] creates a collision between the girl and pillow with
+  given info g and p*)
+let collision_creator g p =
+  if p.fly_speed > 0 then
+    PillowOnGirl (Pillow p, Bloom g)
+  else
+    GirlOnPillow (Girl g, Pillow p)
+
+(*[cd_list_girl i plst] is the list of collisions given the girl and all
+  pillows in the game *)
+let rec cd_list_girl i plst acc =
+  match plst with
+  | [] -> acc
+  | h::t ->
+    begin match h with
+      | Regular p -> cd_list_girl i t ((if collision_detected i p then
+                                         collision_creator i p)::acc)
+
+(*[cd_updater s] returns a new state s' with all of the collisions added to the
+  state's collision list. *)
+let cd_updater s =
+  match s.bloom with
+  | Bloom of i -> let s1 = s.collisions <- (cd_list_girl i s.pillows)
 
 (*[remove_pillow it plst] removes the pillow with info it from plst, if it is
   found in the list, if not found, returns the original plst (helper method
@@ -156,8 +179,10 @@ let collisionHandler c s =
         let _ = s.mcup = Margarinecup i in s
     end
 
-
 let isColliding o1 o2 = failwith "unimplemented"
+
+let update_collisions = failwith "unimplemented"
+
 
 (* Keydown event handler translates a key press *)
 let keydown event =
