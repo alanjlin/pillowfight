@@ -135,19 +135,19 @@ let collision_creator g p =
 
 (*[cd_list_girl i plst] is the list of collisions given the girl and all
   pillows in the game *)
-let rec cd_list_girl i plst acc =
-  match plst with
+let rec cd_list_girl i plst acc = failwith "unimplemented"
+  (* match plst with
   | [] -> acc
   | h::t ->
     begin match h with
       | Regular p -> cd_list_girl i t ((if collision_detected i p then
-                                         collision_creator i p)::acc)
+                                         collision_creator i p)::acc) *)
 
 (*[cd_updater s] returns a new state s' with all of the collisions added to the
   state's collision list. *)
-let cd_updater s =
-  match s.bloom with
-  | Bloom of i -> let s1 = s.collisions <- (cd_list_girl i s.pillows)
+let cd_updater s = failwith "unimplemented"
+  (* match s.bloom with
+  | Bloom of i -> let s1 = s.collisions <- (cd_list_girl i s.pillows) *)
 
 (*[remove_pillow it plst] removes the pillow with info it from plst, if it is
   found in the list, if not found, returns the original plst (helper method
@@ -231,10 +231,6 @@ let collisionHandler c s =
 
 let isColliding o1 o2 = failwith "unimplemented"
 
-<<<<<<< HEAD
-let update_collisions = failwith "unimplemented"
-
-=======
 (* let rec update_all context =
   let rec loop st =
     let st' = update_st st in
@@ -243,7 +239,6 @@ let update_collisions = failwith "unimplemented"
       Js.wrap_callback (fun (t:float) -> loop st')
     ))
 in loop init_st *)
->>>>>>> c89416ea5a80713d04ca6f380659cc1a36b21600
 
 (* Keydown event handler translates a key press *)
 let keydown event =
