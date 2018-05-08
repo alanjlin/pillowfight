@@ -37,6 +37,9 @@ let draw_bg context =
                           0., 0., _BGSIZE, _BGSIZE)
 
 (* [draw_state context state] currently hard-coded to work with  *)
-let draw_state (context: Dom_html.canvasRenderingContext2D Js.t) =
-  draw_actor context;
-  draw_bg context;
+(* We will later need to pass in an argument for which girl. It is hardcoded for now.*)
+let draw_state (context: Dom_html.canvasRenderingContext2D Js.t) state=
+  match state.mcup with
+  | Margarinecup i -> draw_bg context;
+    update_draw_actor i context;
+  | _ -> failwith "not possible"

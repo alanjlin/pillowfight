@@ -32,4 +32,4 @@ returns: nothing*)
 returns: nothing*)
 (* val game_over_display : unit -> unit *)
 
-val draw_state: Dom_html.canvasRenderingContext2D Js.t -> unit
+val draw_state: Dom_html.canvasRenderingContext2D Js.t -> st -> unit
