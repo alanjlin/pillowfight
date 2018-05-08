@@ -13,7 +13,7 @@ let update_draw_actor info context =
   img##src <- (Js.string "./pics/sprite.png");
   let dx = fst info.coordinate in
   let dy = snd info.coordinate in
-  context##drawImage_full(img, 0, 0, 40, 40, dx, dy, 40, 40)
+  context##drawImage_full(img, 0., 0., 40., 40., dx, dy, 40, 40)
 
 (* [draw_actor context] draws the sprite image. currently hardcoded for just
 the sprite *)
