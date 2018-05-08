@@ -127,11 +127,11 @@ let collision_detector i1 i2 =
 
 (*[collision_creator g p] creates a collision between the girl and pillow with
   given info g and p*)
-let collision_creator g p =
+(* let collision_creator g p =
   if p.fly_speed > 0 then
     PillowOnGirl (Pillow p, Bloom g)
   else
-    GirlOnPillow (Girl g, Pillow p)
+    GirlOnPillow (Girl g, Pillow p) *)
 
 (*[cd_list_girl i plst] is the list of collisions given the girl and all
   pillows in the game *)
