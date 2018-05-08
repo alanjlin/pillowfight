@@ -1,5 +1,6 @@
 open State
 open Actors
+open Constants
 
 module Html = Dom_html
 let js = Js.string
@@ -12,7 +13,7 @@ let update_draw_actor info context =
   img##src <- (Js.string "./pics/sprite.png");
   let dx = fst info.coordinate in
   let dy = snd info.coordinate in
-  context##drawImage_full(img, 0, 0, 20, 20, dx, dy, 20, 20)
+  context##drawImage_full(img, 0, 0, 40, 40, dx, dy, 40, 40)
 
 (* [draw_actor context] draws the sprite image. currently hardcoded for just
 the sprite *)
@@ -30,7 +31,10 @@ let draw_bg context =
      dx = 0, dy = 0, dWidth = 400, dHeight = 400,
      bg name = background.png
   *)
-  context##drawImage_full(img, 0., 0., 400., 400., 0., 0., 400., 400.)
+  (* context##drawImage_full(img, 0., 0., 400., 400.,
+                          0., 0., 400., 400.) *)
+  context##drawImage_full(img, 0., 0., _BGSIZE, _BGSIZE,
+                          0., 0., _BGSIZE, _BGSIZE)
 
 (* [draw_state context state] currently hard-coded to work with  *)
 let draw_state (context: Dom_html.canvasRenderingContext2D Js.t) =
