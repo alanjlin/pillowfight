@@ -1,3 +1,4 @@
+open Actors
 (* The [state] of the game represents all the variables and information
 * necessary for any instance of gameplay. [state] is essential in
 * gameplay because it is responsible for keeping track of every
@@ -6,25 +7,33 @@
 
 (* The implementation of type will serve to store all information
  * required to run the game. Perhaps a record would be good.*)
-type st
+ type collision =
+   | GirlOnWall of girl * furniture
+   | GirlOnPillow of girl * pillow
+   | PillowOnGirl of pillow * girl
 
-type collision =
-  | GirlOnGirl
-  | GirlOnWall
-  | GirlOnPillow
-  | PillowOnGirl
+type st = {
+  mutable bloom: girl;
+  mutable soap: girl;
+  mutable mcup: girl;
+  mutable pillows: pillow list;
+  mutable collisions: collision list;
+  mutable scores: (string * int) list;
+  mutable time: float;
+}
 
-  (* Controls correspond to keyboard input *)
-  type move = Space | Left | Right | Up | Down
-
+type move = {
+  mutable up: bool;
+  mutable down: bool;
+  mutable left: bool;
+  mutable right: bool;
+  mutable space: bool;
+}
 
 (* The following methods are accessors *)
 
-(* Returns: a list of girl objects. *)
-val girls: st -> Actors.girl list
-
 (* Returns: a list of pillows currently on the map*)
-val pillows: st -> Actors.pillow list
+val pillows: st -> pillow list
 
 (* Returns: the professor in the game. *)
 (* val prof: state -> Actors.people *)
@@ -32,14 +41,11 @@ val pillows: st -> Actors.pillow list
 (* Returns: the bed object*)
 (* val bed: state -> Actors.furniture *)
 
-(* Returns: the walls, or "parameters" of the game.*)
-val walls: st -> Actors.furniture list
-
 (* Returns: a list of collisions that are taking place in [state]*)
 val collisions: st -> collision list
 
 (* Returns: An association list with each girl and her score.*)
-val scores: st -> (Actors.girl * int) list
+val scores: st -> (string * int) list
 
 (* Returns: the global timer in the game before game ends.*)
 val time: st -> float
@@ -60,4 +66,12 @@ val move_handler : move -> st -> st
    with the girl holding the pillow. Another example: when the girls collides
    with the bed, the girl should slow down.
   returns: the updated state *)
-  val collisionHandler: collision -> st -> st
+val collisionHandler: collision -> st -> st
+
+(* val update_all: Dom_html.canvasRenderingContext2D Js.t -> unit *)
+
+val keydown: Dom_html.keyboardEvent Js.t -> bool Js.t
+
+val keyup: Dom_html.keyboardEvent Js.t -> bool Js.t
+
+val init_st: st
