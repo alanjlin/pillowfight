@@ -42,5 +42,5 @@ let draw_bg context =
 let draw_state (context: Dom_html.canvasRenderingContext2D Js.t) state=
   match state.mcup with
   | Margarinecup m -> draw_bg context;
-    update_draw_actor i context;
+    update_draw_actor m context;
   | _ -> failwith "not possible"

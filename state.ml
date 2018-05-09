@@ -124,7 +124,8 @@ let generate_pillow s =
       direction = 0;
       coordinate = (Random.int (int_of_float _BGSIZE),
                     Random.int (int_of_float _BGSIZE));
-      has_pillow = false
+      has_pillow = false;
+      img_src = "./pics/pillow.png";
     }) in s.pillows <- new_pillow :: s.pillows
 
 let check_pillow_spawn s =
