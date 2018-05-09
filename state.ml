@@ -68,13 +68,24 @@ let init_mcup = Margarinecup {
     img_src = "./pics/mcup.png";
   }
 
+let init_pillow = Regular {
+    move_speed = 1;
+    fly_speed = 0;
+    throw_power = 1;
+    recovery_time = 3;
+    direction = 1;
+    coordinate = (50, 100);
+    has_pillow = false;
+    img_src = "./pics/sprite_og.png";
+  }
+
 let reset_last_time lt = lt := Unix.gettimeofday ()
 
 let init_st = {
   bloom = init_bloom;
   soap = init_soap;
   mcup = init_mcup;
-  pillows = [];
+  pillows = [init_pillow];
   collisions = [];
   scores = [("bloom", 0); ("soap", 0); ("mcup", 0)];
   time = 0.;
@@ -125,12 +136,12 @@ let generate_pillow s =
       coordinate = (Random.int (int_of_float _BGSIZE),
                     Random.int (int_of_float _BGSIZE));
       has_pillow = false;
-      img_src = "./pics/pillow.png";
+      img_src = "./pics/sprite_og.png";
     }) in s.pillows <- new_pillow :: s.pillows
 
 let check_pillow_spawn s =
   if s.random_time = 0.
-  then (s.random_time <- ((Random.float 3.) +. 5.))
+  then (s.random_time <- ((Random.float 3.) +. 1.))
   else if (s.time -. s.last_time_of_pillow_spawn >= s.random_time)
   then (generate_pillow s; s.last_time_of_pillow_spawn <- s.time )
   else ()
