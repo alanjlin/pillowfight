@@ -36,10 +36,15 @@ let draw_bg context =
                           0., 0., 400., 400.) *)
   context##drawImage_full(img, 0., 0., _BGSIZE, _BGSIZE,
                           0., 0., _BGSIZE, _BGSIZE)
-
+(* [wipe context] resets the context to a blank square context with
+   side length [_BGSIZE] *)
+let wipe (context: Dom_html.canvasRenderingContext2D Js.t) =
+  context##clearRect (0., 0., _BGSIZE, _BGSIZE);
+  
 (* [draw_state context state] currently hard-coded to work with  *)
 (* We will later need to pass in an argument for which girl. It is hardcoded for now.*)
 let draw_state (context: Dom_html.canvasRenderingContext2D Js.t) state=
+  wipe context;
   match state.mcup with
   | Margarinecup m -> draw_bg context;
     update_draw_actor m context;
