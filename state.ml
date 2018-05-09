@@ -38,7 +38,8 @@ let init_bloom =  Bloom {
     recovery_time = 3;
     direction = 1;
     coordinate = (0, 0);
-    has_pillow = false
+    has_pillow = false;
+    img_src = "./pics/bloom.png";
   }
 
 let init_soap = Soap {
@@ -48,7 +49,8 @@ let init_soap = Soap {
     recovery_time = 3;
     direction = 1;
     coordinate = (0, 0);
-    has_pillow = false
+    has_pillow = false;
+    img_src = "./pics/soap.png";
   }
 
 let init_mcup = Margarinecup {
@@ -58,7 +60,8 @@ let init_mcup = Margarinecup {
     recovery_time = 3;
     direction = 1;
     coordinate = (0, 0);
-    has_pillow = false
+    has_pillow = false;
+    img_src = "./pics/mcup.png";
   }
 
 let init_st = {

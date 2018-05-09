@@ -5,7 +5,8 @@ type info = {
   recovery_time: int;
   mutable direction: int; (*no direction = 0; up = 1; right = 2; down = 3; left = 4*)
   mutable coordinate: int * int;
-  mutable has_pillow: bool
+  mutable has_pillow: bool;
+  img_src: string;
 }
 
 type girl = Bloom of info | Soap of info | Margarinecup of info

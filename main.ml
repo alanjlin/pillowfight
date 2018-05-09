@@ -5,6 +5,7 @@ module Html = Dom_html
 let rec update_all context =
   let rec loop st =
     let st' = State.update_st st in
+    (* NOTE: add st back into draw_state once we actually update for movement *)
     Display.draw_state context st';
     ignore (Html.window##requestAnimationFrame(
       Js.wrap_callback (fun (t:float) -> loop st')
@@ -20,5 +21,7 @@ let initialize () =
       (Dom_html.handler State.keydown) _true in
   let _ = Dom_html.addEventListener Dom_html.document Dom_html.Event.keyup
       (Dom_html.handler State.keyup) _true in
-  update_all context
+  update_all context;
+  let _ = update_all context in print_endline "hello"
+
 let _ = initialize ()
