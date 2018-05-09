@@ -1,4 +1,5 @@
 open Actors
+open Constants
 
 type move = {
   mutable up: bool;
@@ -21,6 +22,9 @@ type st = {
   mutable collisions: collision list;
   mutable scores: (string * int) list;
   mutable time: float;
+  mutable last_time_of_pillow_spawn: float;
+  mutable random_time: float;
+  game_start: float
 }
 
 let player_keys = {
@@ -64,6 +68,8 @@ let init_mcup = Margarinecup {
     img_src = "./pics/mcup.png";
   }
 
+let reset_last_time lt = lt := Unix.gettimeofday ()
+
 let init_st = {
   bloom = init_bloom;
   soap = init_soap;
@@ -71,7 +77,10 @@ let init_st = {
   pillows = [];
   collisions = [];
   scores = [("bloom", 0); ("soap", 0); ("mcup", 0)];
-  time = 0.
+  time = 0.;
+  last_time_of_pillow_spawn = 0.;
+  random_time = 0.;
+  game_start = Unix.gettimeofday ()
 }
 
 let pillows s = s.pillows
@@ -82,42 +91,57 @@ let scores s = s.scores
 
 let time s = s.time
 
-
-
-let last_time = ref (Unix.gettimeofday ())
-
 (* [Requires]: lt is [last_time]
  * [Returns]: Difference between current time and last time. *)
 let get_time_diff lt =
-   (Unix.gettimeofday ()) -. !lt
-
-(* [Effects]: Changes last time to current time. *)
-let reset_last_time lt = lt := Unix.gettimeofday ()
+   (Unix.gettimeofday ()) -. lt
 
 (* Checks if a given set of coordinates fits within a 400x400 square. *)
 let is_in_bounds coord : bool =
-  if fst coord >= 0 && fst coord <= 400
-     && snd coord >= 0 && snd coord <= 400 then true else false
+  if fst coord >= 0 && fst coord <= int_of_float _BGSIZE
+     && snd coord >= 0 && snd coord <= int_of_float _BGSIZE
+  then true else false
 
 (* helper function for update, checks for user press of keys and updates
  * corresponding movement. *)
 let update_pmovement (girl:Actors.info) keys =
   if keys.up && (snd girl.coordinate >= 0) then (girl.direction <- 1;
                      let c = girl.coordinate in girl.coordinate <- (fst c, snd c - girl.move_speed))
-  else if keys.down && (snd girl.coordinate <= 400) then (girl.direction <- 3;
+  else if keys.down && (snd girl.coordinate <= int_of_float _BGSIZE) then (girl.direction <- 3;
                             let c = girl.coordinate in girl.coordinate <- (fst c, snd c + girl.move_speed))
   else if keys.left && (fst girl.coordinate >= 0) then (girl.direction <- 4;
                             let c = girl.coordinate in girl.coordinate <- (fst c - girl.move_speed, snd c))
-  else if keys.right && (fst girl.coordinate <= 400) then (girl.direction <- 2;
+  else if keys.right && (fst girl.coordinate <= int_of_float _BGSIZE) then (girl.direction <- 2;
                              let c = girl.coordinate in girl.coordinate <- (fst c + girl.move_speed, snd c))
-    else ()
+  else ()
+
+let generate_pillow s =
+  let new_pillow = Regular ({
+      move_speed = 0;
+      fly_speed = 0;
+      throw_power = 5;
+      recovery_time = 0;
+      direction = 0;
+      coordinate = (Random.int (int_of_float _BGSIZE),
+                    Random.int (int_of_float _BGSIZE));
+      has_pillow = false
+    }) in s.pillows <- new_pillow :: s.pillows
+
+let check_pillow_spawn s =
+  if s.random_time = 0.
+  then (s.random_time <- ((Random.float 3.) +. 5.))
+  else if (s.time -. s.last_time_of_pillow_spawn >= s.random_time)
+  then (generate_pillow s; s.last_time_of_pillow_spawn <- s.time )
+  else ()
+
+let update_time s =
+  s.time <- get_time_diff s.game_start
 
 let update_st s =
+  let _ = update_time s in let _ = check_pillow_spawn s in
     match s.mcup with
     | Margarinecup m -> let _ =  update_pmovement m player_keys in s
     | _ -> s
-
-let move_handler m s = failwith "unimplemented"
 
 (*[collision_detector s] determines whether there is a collision given the
   information of the two objects. returns true if there is a collision, false

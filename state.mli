@@ -20,6 +20,9 @@ type st = {
   mutable collisions: collision list;
   mutable scores: (string * int) list;
   mutable time: float;
+  mutable last_time_of_pillow_spawn: float;
+  mutable random_time: float;
+  game_start: float
 }
 
 type move = {
@@ -54,12 +57,6 @@ val time: st -> float
  * Checks for statuses of many game methods, increments time, keeps
  * track of score, collisions, girl positions, professor, pillows.*)
 val update_st: st -> st
-
-(*[move_handler m s] is the new state produced after a move m is processed on
-  state s the new state represents new state regardless of whether the move was
-  possible or not. For example, [move_handler space state] would return a new
-  state regardless of whether a girl currently has pillow to throw or not *)
-val move_handler : move -> st -> st
 
 (* effects: [collisionHandler cl st] updates the state depending on the collision.
    For example, if a girl collides with a pillow, the state should be updated
