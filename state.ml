@@ -170,21 +170,21 @@ let collision_creator g p name =
   if p.fly_speed = 0 then
     GirlOnPillow ((if name = "bloom" then Bloom g
                    else if name = "soap" then Soap g
-                   else Margarinecup g), Pillow p)
+                   else Margarinecup g), Regular p)
   else
-    PillowOnGirl (Pillow p, (if name = "bloom" then Bloom g
+    PillowOnGirl (Regular p, (if name = "bloom" then Bloom g
                              else if name = "soap" then Soap g
                              else Margarinecup g))
 
 (*[cd_list_girl i plst] is the list of collisions given the girl and all
   pillows in the game *)
-let rec cd_list_girl i plst acc name = failwith "unimplemented"
+let rec cd_list_girl i plst acc name =
   match plst with
   | [] -> acc
   | h::t ->
     begin match h with
       | Regular p -> cd_list_girl i t (if collision_detected i p then
-                                         (collision_creator i p name)::acc else acc)
+                                         (collision_creator i p name)::acc else acc) name
     end
 
 (*[cd_updater s] returns a new state s' with all of the collisions added to the
@@ -193,12 +193,15 @@ let cd_updater s =
   match s.bloom with
   | Bloom b -> let c1 = cd_list_girl b s.pillows [] "bloom" in
     begin match s.soap with
-      | Soap b -> let c2 = cd_list_girl b s.pillows c1 "soap" in
+      | Soap b -> let _ = cd_list_girl b s.pillows c1 "soap" in
         begin match s.mcup with
           | Margarinecup b -> let c3 = cd_list_girl b s.pillows c1 "mcup" in
             s.collisions <- c3; s
+          | _ -> s
         end
+      | _ -> s
     end
+  | _ -> s
 
 (*[remove_pillow it plst] removes the pillow with info it from plst, if it is
   found in the list, if not found, returns the original plst (helper method
@@ -291,7 +294,7 @@ let rec coll_list_proc clist state =
   have been detected and processed. returns a new state to be called by the
   update all function. *)
 let update_collisions state =
-  let s_with_collisions = cd_updater state in
+  let _ = cd_updater state in
   let s' = coll_list_proc state.collisions state in s'
 
 (* let rec update_all context =
