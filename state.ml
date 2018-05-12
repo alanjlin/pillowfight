@@ -148,12 +148,6 @@ let check_pillow_spawn s =
 let update_time s =
   s.time <- get_time_diff s.game_start
 
-let update_st s =
-  let _ = update_time s in let _ = check_pillow_spawn s in
-    match s.mcup with
-    | Margarinecup m -> let _ =  update_pmovement m player_keys in s
-    | _ -> s
-
 (*[collision_detector s] determines whether there is a collision given the
   information of the two objects. returns true if there is a collision, false
 otherwise. *)
@@ -294,8 +288,14 @@ let rec coll_list_proc clist state =
   have been detected and processed. returns a new state to be called by the
   update all function. *)
 let update_collisions state =
-  let _ = cd_updater state in
-  let s' = coll_list_proc state.collisions state in s'
+  let _ = cd_updater state in state
+
+let update_st s =
+  let _ = update_time s in let _ = check_pillow_spawn s in
+    match s.mcup with
+    | Margarinecup m -> let _ =  update_pmovement m player_keys
+      in update_collisions s
+    | _ -> s
 
 (* let rec update_all context =
   let rec loop st =

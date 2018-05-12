@@ -5,7 +5,6 @@ module Html = Dom_html
 let rec update_all context =
   let rec loop st =
     let st' = State.update_st st in
-    (* NOTE: add st back into draw_state once we actually update for movement *)
     Display.draw_state context st';
     ignore (Html.window##requestAnimationFrame(
       Js.wrap_callback (fun (t:float) -> loop st')
