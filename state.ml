@@ -136,7 +136,7 @@ let generate_pillow s =
                     Random.int (int_of_float _BGSIZE));
       has_pillow = false;
       img_src = "./pics/sprite_og.png";
-    }) in s.pillows <- new_pillow :: s.pillows
+    }) in s.pillows <- (new_pillow :: s.pillows)
 
 let check_pillow_spawn s =
   if s.random_time = 0.
@@ -275,7 +275,58 @@ let collision_handler c s =
       | Margarinecup i ->
         let _ = i.fly_speed <= 0 in
         let _ = s.mcup = Margarinecup i in s
-    end *)
+     end *)
+
+(*[throw_pillow girl state] is the state after the girl has thrown a pillow.
+  The pillow takes the speed and direction of the girl. requires: girl is a
+  string "bloom" or "soap" or "mcup" indicating which girl threw the pillow
+  and state is the state of the game *)
+let throw_pillow girl state =
+  if girl = "bloom" then
+    match state.bloom with
+    | Bloom i -> i.has_pillow <- false;
+      let p = Regular ({
+          move_speed = 0;
+          fly_speed = i.fly_speed;
+          throw_power = 5;
+          recovery_time = 0;
+          direction = i.direction;
+          coordinate = (Random.int (int_of_float _BGSIZE),
+                        Random.int (int_of_float _BGSIZE));
+          has_pillow = false;
+          img_src = "./pics/sprite_og.png";
+        }) in state.pillows <- (p::state.pillows); state
+| _ -> state
+  else if girl = "soap" then
+    match state.soap with
+    | Soap i -> i.has_pillow <- false;
+          let p = Regular ({
+              move_speed = 0;
+              fly_speed = i.fly_speed;
+              throw_power = 5;
+              recovery_time = 0;
+              direction = i.direction;
+              coordinate = (Random.int (int_of_float _BGSIZE),
+                            Random.int (int_of_float _BGSIZE));
+              has_pillow = false;
+              img_src = "./pics/sprite_og.png";
+            }) in state.pillows <- (p::state.pillows); state
+| _ -> state
+  else
+  match state.mcup with
+    | Margarinecup i -> i.has_pillow <- false;
+          let p = Regular ({
+              move_speed = 0;
+              fly_speed = i.fly_speed;
+              throw_power = 5;
+              recovery_time = 0;
+              direction = i.direction;
+              coordinate = (Random.int (int_of_float _BGSIZE),
+                            Random.int (int_of_float _BGSIZE));
+              has_pillow = false;
+              img_src = "./pics/sprite_og.png";
+            }) in state.pillows <- (p::state.pillows); state
+    | _ -> state
 
 (*[coll_list_proc clist state] is the state with the collisions in state
   processed *)
