@@ -136,7 +136,7 @@ let generate_pillow s =
                     Random.int (int_of_float _BGSIZE));
       has_pillow = false;
       img_src = "./pics/sprite_og.png";
-    }) in s.pillows <- new_pillow :: s.pillows
+    }) in s.pillows <- (new_pillow :: s.pillows)
 
 let check_pillow_spawn s =
   if s.random_time = 0.
@@ -170,21 +170,21 @@ let collision_creator g p name =
   if p.fly_speed = 0 then
     GirlOnPillow ((if name = "bloom" then Bloom g
                    else if name = "soap" then Soap g
-                   else Margarinecup g), Pillow p)
+                   else Margarinecup g), Regular p)
   else
-    PillowOnGirl (Pillow p, (if name = "bloom" then Bloom g
+    PillowOnGirl (Regular p, (if name = "bloom" then Bloom g
                              else if name = "soap" then Soap g
                              else Margarinecup g))
 
 (*[cd_list_girl i plst] is the list of collisions given the girl and all
   pillows in the game *)
-let rec cd_list_girl i plst acc name = failwith "unimplemented"
+let rec cd_list_girl i plst acc name =
   match plst with
   | [] -> acc
   | h::t ->
     begin match h with
       | Regular p -> cd_list_girl i t (if collision_detected i p then
-                                         (collision_creator i p name)::acc else acc)
+                                         (collision_creator i p name)::acc else acc) name
     end
 
 (*[cd_updater s] returns a new state s' with all of the collisions added to the
@@ -278,7 +278,55 @@ let collision_handler c s =
       | Margarinecup i ->
         let _ = i.fly_speed <= 0 in
         let _ = s.mcup = Margarinecup i in s
-    end *)
+     end *)
+
+(*[throw_pillow girl state] is the state after the girl has thrown a pillow.
+  The pillow takes the speed and direction of the girl. requires: girl is a
+  string "bloom" or "soap" or "mcup" indicating which girl threw the pillow
+  and state is the state of the game *)
+let throw_pillow girl state =
+  if girl = "bloom" then
+    match state.bloom with
+    | Bloom i -> i.has_pillow <- false;
+      let p = Regular ({
+          move_speed = 0;
+          fly_speed = i.fly_speed;
+          throw_power = 5;
+          recovery_time = 0;
+          direction = i.direction;
+          coordinate = (Random.int (int_of_float _BGSIZE),
+                        Random.int (int_of_float _BGSIZE));
+          has_pillow = false;
+          img_src = "./pics/sprite_og.png";
+        }) in state.pillows <- (p::state.pillows); state
+  else if girl = "soap" then
+    match state.soap with
+    | Soap i -> i.has_pillow <- false;
+          let p = Regular ({
+              move_speed = 0;
+              fly_speed = i.fly_speed;
+              throw_power = 5;
+              recovery_time = 0;
+              direction = i.direction;
+              coordinate = (Random.int (int_of_float _BGSIZE),
+                            Random.int (int_of_float _BGSIZE));
+              has_pillow = false;
+              img_src = "./pics/sprite_og.png";
+            }) in state.pillows <- (p::state.pillows); state
+  else
+  match state.mcup with
+    | Margarinecup i -> i.has_pillow <- false;
+          let p = Regular ({
+              move_speed = 0;
+              fly_speed = i.fly_speed;
+              throw_power = 5;
+              recovery_time = 0;
+              direction = i.direction;
+              coordinate = (Random.int (int_of_float _BGSIZE),
+                            Random.int (int_of_float _BGSIZE));
+              has_pillow = false;
+              img_src = "./pics/sprite_og.png";
+            }) in state.pillows <- (p::state.pillows); state
 
 (*[coll_list_proc clist state] is the state with the collisions in state
   processed *)
@@ -292,7 +340,7 @@ let rec coll_list_proc clist state =
   update all function. *)
 let update_collisions state =
   let s_with_collisions = cd_updater state in
-  let s' = coll_list_proc state.collisions state in s'
+  let s' = coll_list_proc s_with_collisions.collisions s_with_collisions in s'
 
 (* let rec update_all context =
   let rec loop st =
