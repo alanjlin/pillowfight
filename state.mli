@@ -8,7 +8,6 @@ open Actors
 (* The implementation of type will serve to store all information
  * required to run the game. Perhaps a record would be good.*)
  type collision =
-   | GirlOnWall of girl * furniture
    | GirlOnPillow of girl * pillow
    | PillowOnGirl of pillow * girl
 
@@ -63,7 +62,7 @@ val update_st: st -> st
    with the girl holding the pillow. Another example: when the girls collides
    with the bed, the girl should slow down.
   returns: the updated state *)
-val collisionHandler: collision -> st -> st
+val collision_handler: collision -> st -> st
 
 (* val update_all: Dom_html.canvasRenderingContext2D Js.t -> unit *)
 
