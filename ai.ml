@@ -18,20 +18,35 @@ let rec find_closest_pillow cgirl clist acc =
     then find_closest_pillow cgirl t (x, y)
     else find_closest_pillow cgirl t acc
 
-let move_to_closest_pillow girl s : info = failwith "unimplemented"
-  (* let cgirl = begin match girl with
-    | Bloom b -> b.coordinate
-    | Soap s -> s.coordinate
-    | Margarinecup m -> m.coordinate
-  end in
+(* [move_to_closest_pillow] moves a girl with info [girl] in the state s to
+ * the nearest pillow. For now, this function gets x right first, then y.
+   NOTE: consider choosing x or y first randomly, or switching after a random
+   amount of time.
+ * Requires: [s] is the state of the game, [girl] is the info of the desired
+ * girl to automate move.*)
+let move_to_closest_pillow (girl: info) s =
+  let cgirl = girl.coordinate in
   let clist =
     List.map (fun p -> match p with Regular i -> i.coordinate) s.pillows in
   let pillow_coord = find_closest_pillow cgirl clist cgirl in
-  if fst pillow_coord - fst cgirl > 1 then s <-  *)
-
+  if fst pillow_coord - fst cgirl > 1 then
+    girl.coordinate <- (fst cgirl + girl.move_speed, snd cgirl)
+  else if fst pillow_coord - fst cgirl < -1 then
+    girl.coordinate <- (fst cgirl - girl.move_speed, snd cgirl)
+  else if snd pillow_coord - snd cgirl > 1 then
+    girl.coordinate <- (fst cgirl, snd cgirl + girl.move_speed)
+  else if snd pillow_coord - snd cgirl < -1 then
+    girl.coordinate <- (fst cgirl, snd cgirl - girl.move_speed)
+  else ()
 
 let update_ai s =
   let s' = begin match s.bloom with
-    | Bloom b -> s.bloom <- Bloom (move_to_closest_pillow b s); s
+    | Bloom b ->
+      if b.has_pillow then () else move_to_closest_pillow b s;
+      begin match s.soap with
+        | Soap so ->
+          if so.has_pillow then () else move_to_closest_pillow so s; s
+        | _ -> s
+      end
     | _ -> s
   end in s'
