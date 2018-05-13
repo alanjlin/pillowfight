@@ -17,7 +17,6 @@ type st = {
   mutable mcup: girl;
   mutable pillows: pillow list;
   mutable collisions: collision list;
-  mutable scores: (string * int) list;
   mutable time: float;
   mutable last_time_of_pillow_spawn: float;
   mutable random_time: float;
@@ -45,9 +44,6 @@ val pillows: st -> pillow list
 
 (* Returns: a list of collisions that are taking place in [state]*)
 val collisions: st -> collision list
-
-(* Returns: An association list with each girl and her score.*)
-val scores: st -> (string * int) list
 
 (* Returns: the global timer in the game before game ends.*)
 val time: st -> float

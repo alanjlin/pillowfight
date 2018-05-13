@@ -19,7 +19,6 @@ type st = {
   mutable mcup: girl;
   mutable pillows: pillow list;
   mutable collisions: collision list;
-  mutable scores: (string * int) list;
   mutable time: float;
   mutable last_time_of_pillow_spawn: float;
   mutable random_time: float;
@@ -43,6 +42,8 @@ let init_bloom =  Bloom {
     coordinate = (0, 0);
     has_pillow = false;
     img_src = "./pics/bloom.png";
+    who_threw = "na";
+    score = 0;
   }
 
 let init_soap = Soap {
@@ -54,6 +55,8 @@ let init_soap = Soap {
     coordinate = (0, 0);
     has_pillow = false;
     img_src = "./pics/soap.png";
+    who_threw = "na";
+    score = 0;
   }
 
 let init_mcup = Margarinecup {
@@ -65,6 +68,8 @@ let init_mcup = Margarinecup {
     coordinate = (0, 0);
     has_pillow = false;
     img_src = "./pics/mcup.png";
+    who_threw = "na";
+    score = 0;
   }
 
 let init_pillow = Regular {
@@ -76,6 +81,8 @@ let init_pillow = Regular {
     coordinate = (50, 100);
     has_pillow = false;
     img_src = "./pics/sprite_og.png";
+    who_threw = "na";
+    score = 0;
   }
 
 let reset_last_time lt = lt := Unix.gettimeofday ()
@@ -86,7 +93,6 @@ let init_st = {
   mcup = init_mcup;
   pillows = [init_pillow];
   collisions = [];
-  scores = [("bloom", 0); ("soap", 0); ("mcup", 0)];
   time = 0.;
   last_time_of_pillow_spawn = 0.;
   random_time = 0.;
@@ -96,8 +102,6 @@ let init_st = {
 let pillows s = s.pillows
 
 let collisions s = s.collisions
-
-let scores s = s.scores
 
 let time s = s.time
 
@@ -129,6 +133,8 @@ let is_in_bounds coord : bool =
             coordinate = i.coordinate;
             has_pillow = false;
             img_src = "./pics/sprite_og.png";
+            who_threw = "bloom";
+            score = 0;
           }) in state.pillows <- (p::state.pillows); state
   | _ -> state
     else if girl = "soap" then
@@ -143,6 +149,8 @@ let is_in_bounds coord : bool =
                 coordinate = i.coordinate;
                 has_pillow = false;
                 img_src = "./pics/sprite_og.png";
+                who_threw = "soap";
+                score = 0;
               }) in state.pillows <- (p::state.pillows); state
   | _ -> state
     else
@@ -157,6 +165,8 @@ let is_in_bounds coord : bool =
                 coordinate = i.coordinate;
                 has_pillow = false;
                 img_src = "./pics/sprite_og.png";
+                who_threw = "mcup";
+                score = 0;
               }) in state.pillows <- (p::state.pillows); state
       | _ -> state
 
@@ -196,6 +206,8 @@ let generate_pillow s =
                     Random.int (int_of_float (_BGSIZE -. _PILLOWSIZE)));
       has_pillow = false;
       img_src = "./pics/sprite_og.png";
+      who_threw = "na";
+      score = 0;
     }) in s.pillows <- (new_pillow :: s.pillows) else ()
 
 let check_pillow_spawn s =
@@ -312,15 +324,19 @@ let collision_handler c s =
             let _ = i.fly_speed <- fs in
             let _ = i.direction <- dir in
             let _ = s.bloom <- Bloom i in
+            let _ = if p_info.who_threw = "bloom" then i.score <- i.score + 1 in
             s
           | Soap i ->
             let _ = i.fly_speed <- fs in
             let _ = i.direction <- dir in
-            let _ = s.soap <- Soap i in s
+            let _ = s.soap <- Soap i in
+            let _ = if p_info.who_threw = "soap" then i.score <- i.score + 1 in
+            s
           | Margarinecup i ->
             let _ = i.fly_speed <- fs in
             let _ = i.direction <- dir in
-            let _ = s.mcup <- Margarinecup i in s
+            let _ = s.mcup <- Margarinecup i in
+            let _ = if p_info.who_threw = "mcup" then i.score <- i.score + 1 in s
         end
     end
   (* | GirlOnWall (g, w) ->
