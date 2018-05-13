@@ -213,9 +213,9 @@ let update_time s =
 otherwise. *)
 let collision_detected i1 i2 =
   match i1.coordinate, i2.coordinate with
-  | (x1, y1), (x2, y2) -> if (x1 < x2 + int_of_float _PILLOWSIZE || x1 > x2 - int_of_float _PILLOWSIZE) &&
-                             (y1 < y2 + int_of_float _PILLOWSIZE || y1 > y2 - int_of_float _PILLOWSIZE)
-    then true else false
+  | (x1, y1), (x2, y2) -> (x1 + int_of_float (_GIRLSIZE +. _HITBOXSIZE) >= x2 || x1 <= x2 + int_of_float (_PILLOWSIZE +. _HITBOXSIZE)) &&
+                          (y1 + int_of_float (_GIRLSIZE +. _HITBOXSIZE) >= y2 || y1 <= y2 + int_of_float (_PILLOWSIZE +. _HITBOXSIZE))
+
 
 (*[collision_creator g p] creates a collision between the girl and pillow with
   given info g and p*)
@@ -229,7 +229,7 @@ let collision_creator g p name =
                              else if name = "soap" then Soap g
                              else Margarinecup g))
 
-(*[cd_list_girl i plst] is the list of collisions given the girl and all
+(*[cd_list_girl i plst] is the list of collisions between the girl and all
   pillows in the game *)
 let rec cd_list_girl i plst acc name =
   match plst with
@@ -246,9 +246,9 @@ let cd_updater s =
   match s.bloom with
   | Bloom b -> let c1 = cd_list_girl b s.pillows [] "bloom" in
     begin match s.soap with
-      | Soap b -> let c2 = cd_list_girl b s.pillows c1 "soap" in
+      | Soap so -> let c2 = cd_list_girl so s.pillows c1 "soap" in
         begin match s.mcup with
-          | Margarinecup b -> let c3 = cd_list_girl b s.pillows c2 "mcup" in
+          | Margarinecup m -> let c3 = cd_list_girl m s.pillows c2 "mcup" in
             s.collisions <- c3; s
           | _ -> s
         end
@@ -256,7 +256,7 @@ let cd_updater s =
     end
   | _ -> s
 
-(*[remove_pillow it plst] removes the pillow with info it from plst, if it is
+(*[remove_pillow it plst] removes the pillow with info [it] from [plst], if [it] is
   found in the list, if not found, returns the original plst (helper method
   for collision handler)*)
 let rec remove_pillow it plst =
@@ -374,7 +374,7 @@ let update_st s =
     match s.mcup with
     | Margarinecup m -> let _ =  update_pmovement m player_keys
       in let s' = update_pthrow s (Margarinecup m) player_keys
-      in update_collisions s'
+      in cd_updater s'
     | _ -> s
 
 (* let rec update_all context =
