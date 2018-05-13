@@ -366,7 +366,7 @@ let update_collisions state =
   let st1 = cd_updater state in
   let st2 = coll_list_proc st1.collisions st1 in st2
 
-let rec update_pillow_movement plist =
+let rec update_pillow_movement s plist =
   match plist with
   | [] -> plist
   | h :: t -> begin match h with
@@ -378,8 +378,9 @@ let rec update_pillow_movement plist =
           | _ -> p.coordinate
         end in let _ = p.coordinate <- coord in
         if is_in_bounds p.coordinate then
-          Regular p :: update_pillow_movement t
-        else update_pillow_movement t
+          update_pillow_movement s t
+        else
+          (s.pillows <- remove_pillow p plist; update_pillow_movement s t)
     end
 
 (* [update_st] updates the state after every frame of the game. It consolidates
@@ -387,7 +388,7 @@ let rec update_pillow_movement plist =
  * function that will be used by update_all to coordinate with the frontend. *)
 let update_st s =
   let _ = update_time s in let _ = check_pillow_spawn s in
-  let _ = update_pillow_movement s.pillows in
+  let _ = update_pillow_movement s s.pillows in
     match s.mcup with
     | Margarinecup m -> let _ =  update_pmovement m player_keys
       in let s' = update_pthrow s (Margarinecup m) player_keys

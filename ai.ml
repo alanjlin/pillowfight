@@ -6,6 +6,11 @@ open State
 let dist d1 d2 =
   int_of_float (sqrt (float_of_int ((d1 * d1) + (d2 * d2))))
 
+(* Returns: true half of the time, false half of the time. *)
+let twochoice u =
+  let i = Random.int 2 in
+  if i = 0 then true else false
+
 (* [find_closest_pillow] returns the coordinate of the closest pillow.
  * Requires: acc is the coordinates of the girl
  * Returns: coordinate of closest pillow, if no pillows then coordinate
@@ -38,6 +43,12 @@ let move_to_closest_pillow (girl: info) s =
   else if snd pillow_coord - snd cgirl < -1 then
     girl.coordinate <- (fst cgirl, snd cgirl - girl.move_speed)
   else ()
+
+
+
+(* let move_to_girl agirl tgirl = 
+
+let attack_girl (agirl: info) (tgirl: info) =  *)
 
 let update_ai s =
   let s' = begin match s.bloom with
