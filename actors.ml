@@ -7,6 +7,8 @@ type info = {
   mutable coordinate: int * int;
   mutable has_pillow: bool;
   mutable img_src: string;
+  mutable who_threw: string;
+  mutable score: int;
 }
 
 type girl = Bloom of info | Soap of info | Margarinecup of info

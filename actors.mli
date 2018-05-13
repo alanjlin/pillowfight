@@ -7,7 +7,9 @@ type info = {
   mutable direction: int; (*no direction = 0; up = 1; right = 2; down = 3; left = 4*)
   mutable coordinate: int * int;
   mutable has_pillow: bool;
-  mutable img_src : string ;
+  mutable img_src : string;
+  mutable who_threw: string;
+  mutable score: int;
 }
 
 (* variant representing the types of girl *)
