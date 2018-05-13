@@ -61,14 +61,16 @@ let draw_bg context =
      dx = 0, dy = 0, dWidth = 400, dHeight = 400,
      bg name = background.png
   *)
-  context##drawImage_full(img, 0., 0., _BGSIZE, _BGSIZE,0., 0., _BGSIZE, _BGSIZE)
+  context##drawImage_full(img, 0., 0., _BGSIZE, _BGSIZE,
+                          0., 0., _BGSIZE, _BGSIZE)
 
 (* [draw_scoreboard context] draws the scoreboard onto [context].
    static, never does anything else *)
 let draw_scoreboard context =
   let img = (Dom_html.createImg Dom_html.document) in
   img##src <- (Js.string "./pics/scoreboard.png");
-  context##drawImage_full(img, 0., 0., _SBWIDTH, _SBHEIGHT, 600., 0., _SBWIDTH,  _SBHEIGHT)
+  context##drawImage_full(img, 0., 0., _SBWIDTH, _SBHEIGHT,
+                          _BGSIZE, 0., _SBWIDTH,  _SBHEIGHT)
 
 let draw_score context score name =
   let score_coord =
@@ -92,8 +94,14 @@ let draw_time context time =
 let wipe (context: Dom_html.canvasRenderingContext2D Js.t) =
   context##clearRect (0., 0., _BGSIZE, _BGSIZE)
 
-(* [draw_state context state] currently hard-coded to work with  *)
-(* We will later need to pass in an argument for which girl. It is hardcoded for now.*)
+(* [draw_state context state] draws the following items based on info from
+   [state]:
+   - background
+   - score for each girl
+   - time
+   - pillows
+   - each girl
+*)
 let draw_state (context: Dom_html.canvasRenderingContext2D Js.t) state =
   wipe context;
   match state.bloom, state.soap, state.mcup with
@@ -103,7 +111,7 @@ let draw_state (context: Dom_html.canvasRenderingContext2D Js.t) state =
     draw_score context b.score "bloom";
     draw_score context so.score "soap";
     draw_score context m.score "mcup";
-    draw_time context (int_of_float (120. -. state.time));
+    draw_time context (int_of_float (_GAMETIME -. state.time));
     (* changed from m to state.mcup to type check *)
     update_draw_actor state.bloom context;
     update_draw_actor state.soap context;

@@ -15,6 +15,7 @@ val _MSCORECOORDY : float
 
 val _TIMECOORDX : float
 val _TIMECOORDY : float
+val _GAMETIME : float
 
 val _BTHROWSPRITE : string
 val _STHROWSPRITE : string
