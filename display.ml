@@ -69,12 +69,14 @@ let wipe (context: Dom_html.canvasRenderingContext2D Js.t) =
 
 (* [draw_state context state] currently hard-coded to work with  *)
 (* We will later need to pass in an argument for which girl. It is hardcoded for now.*)
-let draw_state (context: Dom_html.canvasRenderingContext2D Js.t) state=
+let draw_state (context: Dom_html.canvasRenderingContext2D Js.t) state =
   wipe context;
-  match state.mcup with
-  | Margarinecup m ->
+  match state.bloom, state.soap, state.mcup with
+  | Bloom b, Soap so, Margarinecup m ->
     draw_bg context;
     (* changed from m to state.mcup to type check *)
+    update_draw_actor state.bloom context;
+    update_draw_actor state.soap context;
     update_draw_actor state.mcup context;
     draw_pillow context state;
-  | _ -> failwith "not possible"
+  | _ -> failwith "not possible";
