@@ -36,7 +36,7 @@ let player_keys = {
 
 let init_bloom =  Bloom {
     move_speed = 2;
-    fly_speed = 3;
+    fly_speed = 4;
     throw_power = 1;
     recovery_time = 3;
     direction = 1;
@@ -47,7 +47,7 @@ let init_bloom =  Bloom {
 
 let init_soap = Soap {
     move_speed = 2;
-    fly_speed = 3;
+    fly_speed = 4;
     throw_power = 1;
     recovery_time = 3;
     direction = 1;
@@ -58,7 +58,7 @@ let init_soap = Soap {
 
 let init_mcup = Margarinecup {
     move_speed = 2;
-    fly_speed = 3;
+    fly_speed = 4;
     throw_power = 1;
     recovery_time = 3;
     direction = 1;
