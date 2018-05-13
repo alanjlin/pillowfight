@@ -277,7 +277,7 @@ let rec remove_pillow it plst =
   | h::t ->
     match h with
     | Regular i ->
-        if it == i then remove_pillow it t
+        if it = i then remove_pillow it t
         else (Regular i)::(remove_pillow it t)
 
 (* effects: [collisionHandler cl st] updates the state depending on the collision.
