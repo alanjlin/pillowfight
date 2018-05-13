@@ -51,7 +51,8 @@ let rec draw_pillow (context: Dom_html.canvasRenderingContext2D Js.t) st =
                             _PILLOWSIZE, _PILLOWSIZE);
     draw_pillow context {st with pillows = t}
 
-(* [draw_bg context] draws the background *)
+(* [draw_bg context] draws the background onto [context].
+   static, never does anything else *)
 let draw_bg context =
   let img = (Dom_html.createImg Dom_html.document) in
   img##src <- (Js.string "./pics/background.png");
@@ -61,6 +62,23 @@ let draw_bg context =
      bg name = background.png
   *)
   context##drawImage_full(img, 0., 0., _BGSIZE, _BGSIZE,0., 0., _BGSIZE, _BGSIZE)
+
+(* [draw_scoreboard context] draws the scoreboard onto [context].
+   static, never does anything else *)
+let draw_scoreboard context =
+  let img = (Dom_html.createImg Dom_html.document) in
+  img##src <- (Js.string "./pics/scoreboard.png");
+  context##drawImage_full(img, 0., 0., _SBWIDTH, _SBHEIGHT, 600., 0., _SBWIDTH,  _SBHEIGHT)
+
+let draw_score context score name =
+  let score_coord =
+    if name = "bloom" then (_BSCORECOORDX, _BSCORECOORDY)
+    else if name = "soap" then (_SSCORECOORDX, _SSCORECOORDY)
+    else (_MSCORECOORDX, _MSCORECOORDY)
+  in
+  context##fillStyle <- (Js.string "white");
+  context##font <- (Js.string "50px 'Magical'");
+  context##fillText (Js.string (string_of_int score), fst score_coord, snd score_coord)
 
 (* [wipe context] resets the context to a blank square context with
    side length [_BGSIZE] *)
@@ -74,6 +92,10 @@ let draw_state (context: Dom_html.canvasRenderingContext2D Js.t) state =
   match state.bloom, state.soap, state.mcup with
   | Bloom b, Soap so, Margarinecup m ->
     draw_bg context;
+    draw_scoreboard context;
+    draw_score context b.score "bloom";
+    draw_score context so.score "soap";
+    draw_score context m.score "mcup";
     (* changed from m to state.mcup to type check *)
     update_draw_actor state.bloom context;
     update_draw_actor state.soap context;
