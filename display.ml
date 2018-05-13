@@ -6,14 +6,28 @@ module Html = Dom_html
 let js = Js.string
 let document = Html.document
 
-(* [update_draw_actor context] draws the sprite image at its updated coordinates.
-   currently hardcoded for just updating the sprite *)
+(* [update_girl_imgsrc info context] assigns the proper img_src based on
+   if the girl represented by [info] has a pillow or not. If the girl does,
+   then the image will be set to the throwing sprite, otherwise it will be
+set to the normal sprite.*)
+let update_girl_imgsrc info context = match info with
+  | Bloom b -> if b.has_pillow then b.img_src <- _BTHROWSPRITE
+               else b.img_src <- _BNORMALSPRITE
+  | Soap so -> if so.has_pillow then so.img_src <- _STHROWSPRITE
+               else so.img_src <- _SNORMALSPRITE
+  | Margarinecup m -> if m.has_pillow then m.img_src <- _MTHROWSPRITE
+                      else m.img_src <- _MNORMALSPRITE
+
+(* [update_draw_actor context] draws the sprite image at its updated coordinates. *)
 let update_draw_actor info context =
+  let _ = update_girl_imgsrc info context in
   let img = (Dom_html.createImg Dom_html.document) in
-  img##src <- (Js.string info.img_src);
+  (* added the line below to type check *)
+  let info' = match info with Bloom b -> b | Soap so -> so | Margarinecup m -> m in
+  img##src <- (Js.string info'.img_src);
   context##drawImage_full(img, 0., 0., _GIRLSIZE, _GIRLSIZE,
-                          float_of_int (fst info.coordinate),
-                          float_of_int (snd info.coordinate),
+                          float_of_int (fst info'.coordinate),
+                          float_of_int (snd info'.coordinate),
                           _GIRLSIZE, _GIRLSIZE)
 
 (* [draw_actor context] draws the sprite image. currently hardcoded for just
@@ -23,6 +37,7 @@ the sprite *)
   img##src <- (Js.string "./pics/sprite.png");
   context##drawImage_full(img, 0., 0., 20., 20., 200., 200., 20., 20.) *)
 
+(* [draw_pillow st] loops through [st.pillows] to draw each pillow *)
 let rec draw_pillow (context: Dom_html.canvasRenderingContext2D Js.t) st =
   match st.pillows with
   | [] -> ()
@@ -59,6 +74,7 @@ let draw_state (context: Dom_html.canvasRenderingContext2D Js.t) state=
   match state.mcup with
   | Margarinecup m ->
     draw_bg context;
-    update_draw_actor m context;
+    (* changed from m to state.mcup to type check *)
+    update_draw_actor state.mcup context;
     draw_pillow context state;
   | _ -> failwith "not possible"
