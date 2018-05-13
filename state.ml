@@ -229,7 +229,7 @@ let collision_creator g p name =
                              else if name = "soap" then Soap g
                              else Margarinecup g))
 
-(*[cd_list_girl i plst] is the list of collisions between the girl and all
+(*[cd_list_girl i plst] is the list of collisions given the girl and all
   pillows in the game *)
 let rec cd_list_girl i plst acc name =
   match plst with
@@ -246,9 +246,9 @@ let cd_updater s =
   match s.bloom with
   | Bloom b -> let c1 = cd_list_girl b s.pillows [] "bloom" in
     begin match s.soap with
-      | Soap so -> let c2 = cd_list_girl so s.pillows c1 "soap" in
+      | Soap b -> let c2 = cd_list_girl b s.pillows c1 "soap" in
         begin match s.mcup with
-          | Margarinecup m -> let c3 = cd_list_girl m s.pillows c2 "mcup" in
+          | Margarinecup b -> let c3 = cd_list_girl b s.pillows c2 "mcup" in
             s.collisions <- c3; s
           | _ -> s
         end
@@ -256,7 +256,7 @@ let cd_updater s =
     end
   | _ -> s
 
-(*[remove_pillow it plst] removes the pillow with info [it] from [plst], if [it] is
+(*[remove_pillow it plst] removes the pillow with info it from plst, if it is
   found in the list, if not found, returns the original plst (helper method
   for collision handler)*)
 let rec remove_pillow it plst =
@@ -375,7 +375,7 @@ let update_st s =
     match s.mcup with
     | Margarinecup m -> let _ =  update_pmovement m player_keys
       in let s' = update_pthrow s (Margarinecup m) player_keys
-      in cd_updater s'
+      in update_collisions s'
     | _ -> s
 
 (* let rec update_all context =
