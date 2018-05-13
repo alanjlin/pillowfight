@@ -34,8 +34,8 @@ let player_keys = {
 }
 
 let init_bloom =  Bloom {
-    move_speed = 2;
-    fly_speed = 4;
+    move_speed = 4;
+    fly_speed = 8;
     throw_power = 1;
     recovery_time = 3;
     direction = 1;
@@ -47,8 +47,8 @@ let init_bloom =  Bloom {
   }
 
 let init_soap = Soap {
-    move_speed = 2;
-    fly_speed = 4;
+    move_speed = 4;
+    fly_speed = 8;
     throw_power = 1;
     recovery_time = 3;
     direction = 1;
@@ -60,8 +60,8 @@ let init_soap = Soap {
   }
 
 let init_mcup = Margarinecup {
-    move_speed = 2;
-    fly_speed = 4;
+    move_speed = 4;
+    fly_speed = 8;
     throw_power = 1;
     recovery_time = 3;
     direction = 1;
@@ -91,7 +91,7 @@ let init_st = {
   bloom = init_bloom;
   soap = init_soap;
   mcup = init_mcup;
-  pillows = [init_pillow];
+  pillows = [];
   collisions = [];
   time = 0.;
   last_time_of_pillow_spawn = 0.;
@@ -195,7 +195,7 @@ let update_pthrow state (girl: girl) keys =
     end else state
 
 let generate_pillow s =
-  if List.length s.pillows < 8 then
+  if List.length s.pillows < 7 then
   let new_pillow = Regular ({
       move_speed = 0;
       fly_speed = 0;

@@ -3,13 +3,13 @@ open Js_of_ocaml
 module Html = Dom_html
 
 let rec update_all context =
-  let rec loop st = let st'' = Ai.update_ai st in
+  let rec loop st ai = let st'' = Ai.update_ai st ai in
     let st' = State.update_st st'' in
     Display.draw_state context st';
     ignore (Html.window##requestAnimationFrame(
-      Js.wrap_callback (fun (t:float) -> loop st')
+      Js.wrap_callback (fun (t:float) -> loop st' ai)
     ))
-in loop State.init_st
+in loop State.init_st Ai.init_ai
 
 let initialize () =
   let canvas = Opt.get(
@@ -20,7 +20,6 @@ let initialize () =
       (Dom_html.handler State.keydown) _true in
   let _ = Dom_html.addEventListener Dom_html.document Dom_html.Event.keyup
       (Dom_html.handler State.keyup) _true in
-  update_all context;
-  let _ = update_all context in print_endline "hello"
+  update_all context
 
 let _ = initialize ()
