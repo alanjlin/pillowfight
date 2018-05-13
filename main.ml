@@ -3,8 +3,8 @@ open Js_of_ocaml
 module Html = Dom_html
 
 let rec update_all context =
-  let rec loop st =
-    let st' = State.update_st st in
+  let rec loop st = let st'' = Ai.update_ai st in
+    let st' = State.update_st st'' in
     Display.draw_state context st';
     ignore (Html.window##requestAnimationFrame(
       Js.wrap_callback (fun (t:float) -> loop st')
