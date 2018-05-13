@@ -71,3 +71,11 @@ val keydown: Dom_html.keyboardEvent Js.t -> bool Js.t
 val keyup: Dom_html.keyboardEvent Js.t -> bool Js.t
 
 val init_st: st
+
+val init_bloom: girl
+
+val init_pillow: pillow
+
+val init_mcup: girl
+
+val init_soap: girl
