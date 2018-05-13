@@ -36,7 +36,7 @@ let player_keys = {
 
 let init_bloom =  Bloom {
     move_speed = 1;
-    fly_speed = 0;
+    fly_speed = 3;
     throw_power = 1;
     recovery_time = 3;
     direction = 1;
@@ -47,7 +47,7 @@ let init_bloom =  Bloom {
 
 let init_soap = Soap {
     move_speed = 1;
-    fly_speed = 0;
+    fly_speed = 3;
     throw_power = 1;
     recovery_time = 3;
     direction = 1;
@@ -58,12 +58,12 @@ let init_soap = Soap {
 
 let init_mcup = Margarinecup {
     move_speed = 1;
-    fly_speed = 0;
+    fly_speed = 3;
     throw_power = 1;
     recovery_time = 3;
     direction = 1;
     coordinate = (0, 0);
-    has_pillow = false;
+    has_pillow = true;
     img_src = "./pics/mcup.png";
   }
 
@@ -112,7 +112,55 @@ let is_in_bounds coord : bool =
      && snd coord >= 0 && snd coord <= int_of_float _BGSIZE
   then true else false
 
-(* helper function for update, checks for user press of keys and updates
+  (*[throw_pillow girl state] is the state after the girl has thrown a pillow.
+    The pillow takes the speed and direction of the girl. requires: girl is a
+    string "bloom" or "soap" or "mcup" indicating which girl threw the pillow
+    and state is the state of the game *)
+  let throw_pillow girl state =
+    if girl = "bloom" then
+      match state.bloom with
+      | Bloom i -> i.has_pillow <- false;
+        let p = Regular ({
+            move_speed = 0;
+            fly_speed = i.fly_speed;
+            throw_power = 5;
+            recovery_time = 0;
+            direction = i.direction;
+            coordinate = i.coordinate;
+            has_pillow = false;
+            img_src = "./pics/sprite_og.png";
+          }) in state.pillows <- (p::state.pillows); state
+  | _ -> state
+    else if girl = "soap" then
+      match state.soap with
+      | Soap i -> i.has_pillow <- false;
+            let p = Regular ({
+                move_speed = 0;
+                fly_speed = i.fly_speed;
+                throw_power = 5;
+                recovery_time = 0;
+                direction = i.direction;
+                coordinate = i.coordinate;
+                has_pillow = false;
+                img_src = "./pics/sprite_og.png";
+              }) in state.pillows <- (p::state.pillows); state
+  | _ -> state
+    else
+    match state.mcup with
+      | Margarinecup i -> i.has_pillow <- false;
+            let p = Regular ({
+                move_speed = 0;
+                fly_speed = i.fly_speed;
+                throw_power = 5;
+                recovery_time = 0;
+                direction = i.direction;
+                coordinate = i.coordinate;
+                has_pillow = false;
+                img_src = "./pics/sprite_og.png";
+              }) in state.pillows <- (p::state.pillows); state
+      | _ -> state
+
+(* helper function for update_state, checks for user press of keys and updates
  * corresponding movement. *)
 let update_pmovement (girl:Actors.info) keys =
   if keys.up && (snd girl.coordinate >= 0) then (girl.direction <- 1;
@@ -124,6 +172,17 @@ let update_pmovement (girl:Actors.info) keys =
   else if keys.right && (fst girl.coordinate <= int_of_float _BGSIZE) then (girl.direction <- 2;
                              let c = girl.coordinate in girl.coordinate <- (fst c + girl.move_speed, snd c))
   else ()
+
+(* helper function for update_state, checks for user space and throws pillow.
+ * This is a separate function from update_pmovement b/c the player should
+ * be able to throw a pillow while he/she is moving. *)
+let update_pthrow state (girl: girl) keys =
+  if keys.space then
+    begin match girl with
+      | Bloom i -> if i.has_pillow then throw_pillow "bloom" state else state
+      | Soap i -> if i.has_pillow then throw_pillow "soap" state else state
+      | Margarinecup i -> if i.has_pillow then throw_pillow "mcup" state else state
+    end else state
 
 let generate_pillow s =
   let new_pillow = Regular ({
@@ -238,7 +297,7 @@ let collision_handler c s =
         if i.has_pillow then s
         else
           let _ = i.has_pillow <- true in
-          let _ = s.soap <- Soap i in
+          let _ = s.mcup <- Margarinecup i in
           begin match p with
             | Regular i -> s.pillows <- (remove_pillow i s.pillows); s
           end
@@ -277,57 +336,6 @@ let collision_handler c s =
         let _ = s.mcup = Margarinecup i in s
      end *)
 
-(*[throw_pillow girl state] is the state after the girl has thrown a pillow.
-  The pillow takes the speed and direction of the girl. requires: girl is a
-  string "bloom" or "soap" or "mcup" indicating which girl threw the pillow
-  and state is the state of the game *)
-let throw_pillow girl state =
-  if girl = "bloom" then
-    match state.bloom with
-    | Bloom i -> i.has_pillow <- false;
-      let p = Regular ({
-          move_speed = 0;
-          fly_speed = i.fly_speed;
-          throw_power = 5;
-          recovery_time = 0;
-          direction = i.direction;
-          coordinate = (Random.int (int_of_float _BGSIZE),
-                        Random.int (int_of_float _BGSIZE));
-          has_pillow = false;
-          img_src = "./pics/sprite_og.png";
-        }) in state.pillows <- (p::state.pillows); state
-| _ -> state
-  else if girl = "soap" then
-    match state.soap with
-    | Soap i -> i.has_pillow <- false;
-          let p = Regular ({
-              move_speed = 0;
-              fly_speed = i.fly_speed;
-              throw_power = 5;
-              recovery_time = 0;
-              direction = i.direction;
-              coordinate = (Random.int (int_of_float _BGSIZE),
-                            Random.int (int_of_float _BGSIZE));
-              has_pillow = false;
-              img_src = "./pics/sprite_og.png";
-            }) in state.pillows <- (p::state.pillows); state
-| _ -> state
-  else
-  match state.mcup with
-    | Margarinecup i -> i.has_pillow <- false;
-          let p = Regular ({
-              move_speed = 0;
-              fly_speed = i.fly_speed;
-              throw_power = 5;
-              recovery_time = 0;
-              direction = i.direction;
-              coordinate = (Random.int (int_of_float _BGSIZE),
-                            Random.int (int_of_float _BGSIZE));
-              has_pillow = false;
-              img_src = "./pics/sprite_og.png";
-            }) in state.pillows <- (p::state.pillows); state
-    | _ -> state
-
 (*[coll_list_proc clist state] is the state with the collisions in state
   processed *)
 let rec coll_list_proc clist state =
@@ -341,11 +349,28 @@ let rec coll_list_proc clist state =
 let update_collisions state =
   let _ = cd_updater state in state
 
+let rec update_pillow_movement plist =
+  match plist with
+  | [] -> plist
+  | h :: t -> begin match h with
+      | Regular p -> let coord = begin match p.direction with
+          | 1 -> ((fst p.coordinate), (snd p.coordinate) - p.fly_speed)
+          | 2 -> ((fst p.coordinate) + p.fly_speed, (snd p.coordinate))
+          | 3 -> ((fst p.coordinate), (snd p.coordinate) + p.fly_speed)
+          | 4 -> ((fst p.coordinate) - p.fly_speed, (snd p.coordinate))
+          | _ -> p.coordinate
+        end in let _ = p.coordinate <- coord in
+        Regular p :: update_pillow_movement t
+    end
+
+
 let update_st s =
   let _ = update_time s in let _ = check_pillow_spawn s in
+  let _ = update_pillow_movement s.pillows in
     match s.mcup with
     | Margarinecup m -> let _ =  update_pmovement m player_keys
-      in update_collisions s
+      in let s' = update_pthrow s (Margarinecup m) player_keys
+      in update_collisions s'
     | _ -> s
 
 (* let rec update_all context =
