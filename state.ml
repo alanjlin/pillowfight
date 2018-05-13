@@ -36,7 +36,7 @@ let player_keys = {
 
 let init_bloom =  Bloom {
     move_speed = 2;
-    fly_speed = 3;
+    fly_speed = 4;
     throw_power = 1;
     recovery_time = 3;
     direction = 1;
@@ -47,7 +47,7 @@ let init_bloom =  Bloom {
 
 let init_soap = Soap {
     move_speed = 2;
-    fly_speed = 3;
+    fly_speed = 4;
     throw_power = 1;
     recovery_time = 3;
     direction = 1;
@@ -58,12 +58,12 @@ let init_soap = Soap {
 
 let init_mcup = Margarinecup {
     move_speed = 2;
-    fly_speed = 3;
+    fly_speed = 4;
     throw_power = 1;
     recovery_time = 3;
     direction = 1;
     coordinate = (0, 0);
-    has_pillow = true;
+    has_pillow = false;
     img_src = "./pics/mcup.png";
   }
 
@@ -213,9 +213,9 @@ let update_time s =
 otherwise. *)
 let collision_detected i1 i2 =
   match i1.coordinate, i2.coordinate with
-  | (x1, y1), (x2, y2) -> (x1 + int_of_float (_GIRLSIZE +. _HITBOXSIZE) >= x2 || x1 <= x2 + int_of_float (_PILLOWSIZE +. _HITBOXSIZE)) &&
-                          (y1 + int_of_float (_GIRLSIZE +. _HITBOXSIZE) >= y2 || y1 <= y2 + int_of_float (_PILLOWSIZE +. _HITBOXSIZE))
-
+  | (x1, y1), (x2, y2) -> if ((abs(x2 - x1) < int_of_float _PILLOWSIZE) &&
+                              (abs(y2 - y1) < int_of_float _PILLOWSIZE))
+    then true else false
 
 (*[collision_creator g p] creates a collision between the girl and pillow with
   given info g and p*)
@@ -265,7 +265,7 @@ let rec remove_pillow it plst =
   | h::t ->
     match h with
     | Regular i ->
-        if it = i then remove_pillow it t
+        if it == i then remove_pillow it t
         else (Regular i)::(remove_pillow it t)
 
 (* effects: [collisionHandler cl st] updates the state depending on the collision.
@@ -341,13 +341,14 @@ let collision_handler c s =
 let rec coll_list_proc clist state =
   match clist with
   | [] -> state
-  | h::t -> let s' = collision_handler h state in coll_list_proc t s'
+  | h::t -> state.collisions <- t; let s' = collision_handler h state in coll_list_proc t s'
 
 (*[update_collisions state] is the new state of the game after all collisions
   have been detected and processed. returns a new state to be called by the
   update all function. *)
 let update_collisions state =
-  let st1 = cd_updater state in st1
+  let st1 = cd_updater state in
+  let st2 = coll_list_proc st1.collisions st1 in st2
 
 let rec update_pillow_movement plist =
   match plist with
