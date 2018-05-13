@@ -80,6 +80,13 @@ let draw_score context score name =
   context##font <- (Js.string "50px 'Magical'");
   context##fillText (Js.string (string_of_int score), fst score_coord, snd score_coord)
 
+(* [draw_time context time] draws [time] (given by state.time) in the time box
+on the scoreboard *)
+let draw_time context time =
+  context##fillStyle <- (Js.string "white");
+  context##font <- (Js.string "25px 'Magical'");
+  context##fillText (Js.string (string_of_int time), _TIMECOORDX, _TIMECOORDY)
+
 (* [wipe context] resets the context to a blank square context with
    side length [_BGSIZE] *)
 let wipe (context: Dom_html.canvasRenderingContext2D Js.t) =
@@ -96,6 +103,7 @@ let draw_state (context: Dom_html.canvasRenderingContext2D Js.t) state =
     draw_score context b.score "bloom";
     draw_score context so.score "soap";
     draw_score context m.score "mcup";
+    draw_time context (int_of_float (120. -. state.time));
     (* changed from m to state.mcup to type check *)
     update_draw_actor state.bloom context;
     update_draw_actor state.soap context;

@@ -13,6 +13,9 @@ val _SSCORECOORDY : float
 val _MSCORECOORDX : float
 val _MSCORECOORDY : float
 
+val _TIMECOORDX : float
+val _TIMECOORDY : float
+
 val _BTHROWSPRITE : string
 val _STHROWSPRITE : string
 val _MTHROWSPRITE : string
