@@ -82,10 +82,12 @@ let rec find_closest_pillow cgirl clist acc =
  * girl to automate move.*)
 let move_to_closest_pillow bot ai (girl: info) s =
   let cgirl = girl.coordinate in
+  let stillpillows = List.filter
+      (fun p -> match p with Regular i -> i.fly_speed = 0) s.pillows in
   let clist =
-    List.map (fun p -> match p with Regular i -> i.coordinate) s.pillows in
+    List.map (fun p -> match p with Regular i -> i.coordinate) stillpillows in
   let pillow_coord = find_closest_pillow cgirl clist cgirl in
-  if ai_decision_cycle bot ai then
+   if ai_decision_cycle bot ai then
     (if fst pillow_coord - fst cgirl > 1 then
       (girl.direction <- 2;
       girl.coordinate <- (fst cgirl + girl.move_speed, snd cgirl))
@@ -102,19 +104,80 @@ let move_to_closest_pillow bot ai (girl: info) s =
        girl.coordinate <- (fst cgirl, snd cgirl - girl.move_speed))
     else toggle_choice bot ai)
 
-(* let move_to_girl agirl tgirl =
+(* [move_to_girl] increments [agirl] movement to [tgirl]*)
+let move_to_girl bot ai agirl tgirl =
+  let ctgirl = tgirl.coordinate in
+  let cagirl = agirl.coordinate in
+  if ai_decision_cycle bot ai then
+    (if fst ctgirl - fst cagirl > 1 then
+       (agirl.direction <- 2;
+        agirl.coordinate <- (fst cagirl + agirl.move_speed, snd cagirl))
+     else if fst ctgirl - fst cagirl < -1 then
+       (agirl.direction <- 4;
+        agirl.coordinate <- (fst cagirl - agirl.move_speed, snd cagirl))
+     else toggle_choice bot ai)
+  else
+    (if snd ctgirl - snd cagirl > 1 then
+       (agirl.direction <- 3;
+        agirl.coordinate <- (fst cagirl, snd cagirl + agirl.move_speed))
+     else if snd ctgirl - snd cagirl < -1 then
+       (agirl.direction <- 1;
+        agirl.coordinate <- (fst cagirl, snd cagirl - agirl.move_speed))
+     else toggle_choice bot ai)
 
-let attack_girl (agirl: info) (tgirl: info) =
-  let acoord = agirl.coordinate in let tcoord = tgirl.coordinate in
-   if *)
+let check_throw s girl ai (agirl: info) (tgirl: info) =
+  let ax = fst agirl.coordinate in
+  let ay = snd agirl.coordinate in
+  let tx = fst tgirl.coordinate in
+  let ty = snd tgirl.coordinate in
+  let diffx = ax - tx in
+  let diffy = ay - ty in
+  if (abs diffx < 10 && abs diffy < 250)
+  then (if diffy > 0 then (agirl.direction <- 1; ignore (throw_pillow girl s))
+        else (agirl.direction <- 3; ignore(throw_pillow girl s)))
+  else if (abs diffy < 10 && abs diffx < 250)
+  then (if diffx > 0 then (agirl.direction <- 4; ignore(throw_pillow girl s))
+        else (agirl.direction <- 2; ignore (throw_pillow girl s) ))
+  else ()
+
+let attack_girl s ai girl bot agirl=
+  match girl with
+  | "bloom" -> begin match ai.b1choice with
+      | true -> begin match s.mcup with
+          | Margarinecup m ->
+            check_throw s girl ai agirl m; move_to_girl bot ai agirl m
+          | _ -> ()
+        end
+      | false -> begin match s.soap with
+          | Soap so ->
+            check_throw s girl ai agirl so; move_to_girl bot ai agirl so
+          | _ -> ()
+        end
+    end
+  | "soap" -> begin match ai.b2choice with
+      | true -> begin match s.mcup with
+          | Margarinecup m ->
+            check_throw s girl ai agirl m; move_to_girl bot ai agirl m
+          | _ -> ()
+        end
+      | false -> begin match s.bloom with
+          | Bloom b ->
+            check_throw s girl ai agirl b; move_to_girl bot ai agirl b
+          | _ -> ()
+        end
+    end
+  | "mcup" -> ()
+  | _ -> ()
 
 let update_ai s ai =
   let s' = begin match s.bloom with
     | Bloom b ->
-      if b.has_pillow then () else move_to_closest_pillow "b1" ai b s;
+      if b.has_pillow then attack_girl s ai "bloom" "b1" b
+      else move_to_closest_pillow "b1" ai b s;
       begin match s.soap with
         | Soap so ->
-          if so.has_pillow then () else move_to_closest_pillow "b2" ai so s; s
+          if so.has_pillow then attack_girl s ai "soap" "b2" so
+          else move_to_closest_pillow "b2" ai so s; s
         | _ -> s
       end
     | _ -> s
