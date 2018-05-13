@@ -106,10 +106,10 @@ let time s = s.time
 let get_time_diff lt =
    (Unix.gettimeofday ()) -. lt
 
-(* Checks if a given set of coordinates fits within a 400x400 square. *)
+(* Checks if a given set of coordinates fits within the background size. *)
 let is_in_bounds coord : bool =
-  if fst coord >= 0 && fst coord <= int_of_float _BGSIZE
-     && snd coord >= 0 && snd coord <= int_of_float _BGSIZE
+  if fst coord >= 0 && fst coord <= int_of_float (_BGSIZE -. _PILLOWSIZE)
+     && snd coord >= 0 && snd coord <= int_of_float (_BGSIZE -. _PILLOWSIZE)
   then true else false
 
   (*[throw_pillow girl state] is the state after the girl has thrown a pillow.
@@ -165,11 +165,11 @@ let is_in_bounds coord : bool =
 let update_pmovement (girl:Actors.info) keys =
   if keys.up && (snd girl.coordinate >= 0) then (girl.direction <- 1;
                      let c = girl.coordinate in girl.coordinate <- (fst c, snd c - girl.move_speed))
-  else if keys.down && (snd girl.coordinate <= int_of_float _BGSIZE) then (girl.direction <- 3;
+  else if keys.down && (snd girl.coordinate <= int_of_float (_BGSIZE -. _GIRLSIZE)) then (girl.direction <- 3;
                             let c = girl.coordinate in girl.coordinate <- (fst c, snd c + girl.move_speed))
   else if keys.left && (fst girl.coordinate >= 0) then (girl.direction <- 4;
                             let c = girl.coordinate in girl.coordinate <- (fst c - girl.move_speed, snd c))
-  else if keys.right && (fst girl.coordinate <= int_of_float _BGSIZE) then (girl.direction <- 2;
+  else if keys.right && (fst girl.coordinate <= int_of_float (_BGSIZE -. _GIRLSIZE)) then (girl.direction <- 2;
                              let c = girl.coordinate in girl.coordinate <- (fst c + girl.move_speed, snd c))
   else ()
 
@@ -185,17 +185,18 @@ let update_pthrow state (girl: girl) keys =
     end else state
 
 let generate_pillow s =
+  if List.length s.pillows < 8 then
   let new_pillow = Regular ({
       move_speed = 0;
       fly_speed = 0;
       throw_power = 5;
       recovery_time = 0;
       direction = 0;
-      coordinate = (Random.int (int_of_float _BGSIZE),
-                    Random.int (int_of_float _BGSIZE));
+      coordinate = (Random.int (int_of_float (_BGSIZE -. _PILLOWSIZE)),
+                    Random.int (int_of_float (_BGSIZE -. _PILLOWSIZE)));
       has_pillow = false;
       img_src = "./pics/sprite_og.png";
-    }) in s.pillows <- (new_pillow :: s.pillows)
+    }) in s.pillows <- (new_pillow :: s.pillows) else ()
 
 let check_pillow_spawn s =
   if s.random_time = 0.
@@ -360,10 +361,14 @@ let rec update_pillow_movement plist =
           | 4 -> ((fst p.coordinate) - p.fly_speed, (snd p.coordinate))
           | _ -> p.coordinate
         end in let _ = p.coordinate <- coord in
-        Regular p :: update_pillow_movement t
+        if is_in_bounds p.coordinate then
+          Regular p :: update_pillow_movement t
+        else update_pillow_movement t
     end
 
-
+(* [update_st] updates the state after every frame of the game. It consolidates
+ * all helper functions above into a nice, readable, state-in-state-out
+ * function that will be used by update_all to coordinate with the frontend. *)
 let update_st s =
   let _ = update_time s in let _ = check_pillow_spawn s in
   let _ = update_pillow_movement s.pillows in
