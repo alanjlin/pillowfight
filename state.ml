@@ -35,7 +35,7 @@ let player_keys = {
 }
 
 let init_bloom =  Bloom {
-    move_speed = 1;
+    move_speed = 2;
     fly_speed = 3;
     throw_power = 1;
     recovery_time = 3;
@@ -46,7 +46,7 @@ let init_bloom =  Bloom {
   }
 
 let init_soap = Soap {
-    move_speed = 1;
+    move_speed = 2;
     fly_speed = 3;
     throw_power = 1;
     recovery_time = 3;
@@ -57,7 +57,7 @@ let init_soap = Soap {
   }
 
 let init_mcup = Margarinecup {
-    move_speed = 1;
+    move_speed = 2;
     fly_speed = 3;
     throw_power = 1;
     recovery_time = 3;
@@ -212,11 +212,10 @@ let update_time s =
   information of the two objects. returns true if there is a collision, false
 otherwise. *)
 let collision_detected i1 i2 =
-  if i1.fly_speed > 0 then false
-  else
   match i1.coordinate, i2.coordinate with
-    | (x1, y1), (x2, y2) -> if x1 < x2 + 20 && x1 > x2 + 20 &&
-                               y1 < y2 + 20 && y1 > y2 - 20 then true else false
+  | (x1, y1), (x2, y2) -> if (x1 < x2 + int_of_float _PILLOWSIZE || x1 > x2 - int_of_float _PILLOWSIZE) &&
+                             (y1 < y2 + int_of_float _PILLOWSIZE || y1 > y2 - int_of_float _PILLOWSIZE)
+    then true else false
 
 (*[collision_creator g p] creates a collision between the girl and pillow with
   given info g and p*)
@@ -247,9 +246,9 @@ let cd_updater s =
   match s.bloom with
   | Bloom b -> let c1 = cd_list_girl b s.pillows [] "bloom" in
     begin match s.soap with
-      | Soap b -> let _ = cd_list_girl b s.pillows c1 "soap" in
+      | Soap b -> let c2 = cd_list_girl b s.pillows c1 "soap" in
         begin match s.mcup with
-          | Margarinecup b -> let c3 = cd_list_girl b s.pillows c1 "mcup" in
+          | Margarinecup b -> let c3 = cd_list_girl b s.pillows c2 "mcup" in
             s.collisions <- c3; s
           | _ -> s
         end
@@ -348,7 +347,7 @@ let rec coll_list_proc clist state =
   have been detected and processed. returns a new state to be called by the
   update all function. *)
 let update_collisions state =
-  let _ = cd_updater state in state
+  let st1 = cd_updater state in st1
 
 let rec update_pillow_movement plist =
   match plist with
