@@ -15,3 +15,14 @@ let _MTHROWSPRITE = "./pics/mcup-throw.png"
 let _BNORMALSPRITE = "./pics/bloom.png"
 let _SNORMALSPRITE = "./pics/soap.png"
 let _MNORMALSPRITE = "./pics/mcup.png"
+
+(* X = 660 will be centered for one digit *)
+let _BSCORECOORDX = 645.
+let _BSCORECOORDY = 140.
+let _SSCORECOORDX = 645.
+let _SSCORECOORDY = 315.
+let _MSCORECOORDX = 645.
+let _MSCORECOORDY = 485.
+
+let _TIMECOORDX = 655.
+let _TIMECOORDY = 580.
