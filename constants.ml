@@ -15,3 +15,10 @@ let _MTHROWSPRITE = "./pics/mcup-throw.png"
 let _BNORMALSPRITE = "./pics/bloom.png"
 let _SNORMALSPRITE = "./pics/soap.png"
 let _MNORMALSPRITE = "./pics/mcup.png"
+
+let _BSCORECOORDX = 650.
+let _BSCORECOORDY = 140.
+let _SSCORECOORDX = 650.
+let _SSCORECOORDY = 320.
+let _MSCORECOORDX = 650.
+let _MSCORECOORDY = 500.

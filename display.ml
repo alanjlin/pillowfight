@@ -70,6 +70,16 @@ let draw_scoreboard context =
   img##src <- (Js.string "./pics/scoreboard.png");
   context##drawImage_full(img, 0., 0., _SBWIDTH, _SBHEIGHT, 600., 0., _SBWIDTH,  _SBHEIGHT)
 
+let draw_score context score name =
+  let score_coord =
+    if name = "bloom" then (_BSCORECOORDX, _BSCORECOORDY)
+    else if name = "soap" then (_SSCORECOORDX, _SSCORECOORDY)
+    else (_MSCORECOORDX, _MSCORECOORDY)
+  in
+  context##fillStyle <- (Js.string "white");
+  context##font <- (Js.string "50px 'Magical'");
+  context##fillText (Js.string (string_of_int score), fst score_coord, snd score_coord)
+
 (* [wipe context] resets the context to a blank square context with
    side length [_BGSIZE] *)
 let wipe (context: Dom_html.canvasRenderingContext2D Js.t) =
@@ -83,6 +93,9 @@ let draw_state (context: Dom_html.canvasRenderingContext2D Js.t) state =
   | Bloom b, Soap so, Margarinecup m ->
     draw_bg context;
     draw_scoreboard context;
+    draw_score context b.score "bloom";
+    draw_score context so.score "soap";
+    draw_score context m.score "mcup";
     (* changed from m to state.mcup to type check *)
     update_draw_actor state.bloom context;
     update_draw_actor state.soap context;
