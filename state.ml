@@ -407,4 +407,4 @@ let keyup event =
   | 40 -> player_keys.down <- false
   | 32 -> player_keys.space <- false
   | _ -> ()
-  in Js._true
+in Js._true
