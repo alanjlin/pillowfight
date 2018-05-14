@@ -44,6 +44,7 @@ let init_bloom =  Bloom {
     img_src = "./pics/bloom.png";
     who_threw = "na";
     score = 0;
+    is_disabled = false;
   }
 
 let init_soap = Soap {
@@ -57,6 +58,7 @@ let init_soap = Soap {
     img_src = "./pics/soap.png";
     who_threw = "na";
     score = 0;
+    is_disabled = false;
   }
 
 let init_mcup = Margarinecup {
@@ -70,6 +72,7 @@ let init_mcup = Margarinecup {
     img_src = "./pics/mcup.png";
     who_threw = "na";
     score = 0;
+    is_disabled = false;
   }
 
 let init_pillow = Regular {
@@ -83,6 +86,7 @@ let init_pillow = Regular {
     img_src = "./pics/sprite_og.png";
     who_threw = "na";
     score = 0;
+    is_disabled = false;
   }
 
 let reset_last_time lt = lt := Unix.gettimeofday ()
@@ -111,9 +115,14 @@ let get_time_diff lt =
    (Unix.gettimeofday ()) -. lt
 
 (* Checks if a given set of coordinates fits within the background size. *)
-let is_in_bounds coord : bool =
+let is_in_bounds_pillow coord : bool =
   if fst coord >= 0 && fst coord <= int_of_float (_BGSIZE -. _PILLOWSIZE)
      && snd coord >= 0 && snd coord <= int_of_float (_BGSIZE -. _PILLOWSIZE)
+  then true else false
+
+let is_in_bounds_girl coord : bool =
+  if fst coord >= 0 && fst coord <= int_of_float (_BGSIZE -. _GIRLSIZE)
+     && snd coord >= 0 && snd coord <= int_of_float (_BGSIZE -. _GIRLSIZE)
   then true else false
 
   (*[throw_pillow girl state] is the state after the girl has thrown a pillow.
@@ -127,7 +136,7 @@ let is_in_bounds coord : bool =
         let p = Regular ({
             move_speed = 0;
             fly_speed = i.fly_speed;
-            throw_power = 5;
+            throw_power = i.throw_power;
             recovery_time = 0;
             direction = i.direction;
             coordinate = i.coordinate;
@@ -135,6 +144,7 @@ let is_in_bounds coord : bool =
             img_src = "./pics/sprite_og.png";
             who_threw = "bloom";
             score = 0;
+            is_disabled = false
           }) in state.pillows <- (p::state.pillows); state
   | _ -> state
     else if girl = "soap" then
@@ -143,7 +153,7 @@ let is_in_bounds coord : bool =
             let p = Regular ({
                 move_speed = 0;
                 fly_speed = i.fly_speed;
-                throw_power = 5;
+                throw_power = i.throw_power;
                 recovery_time = 0;
                 direction = i.direction;
                 coordinate = i.coordinate;
@@ -151,6 +161,7 @@ let is_in_bounds coord : bool =
                 img_src = "./pics/sprite_og.png";
                 who_threw = "soap";
                 score = 0;
+                is_disabled = false
               }) in state.pillows <- (p::state.pillows); state
   | _ -> state
     else
@@ -159,7 +170,7 @@ let is_in_bounds coord : bool =
             let p = Regular ({
                 move_speed = 0;
                 fly_speed = i.fly_speed;
-                throw_power = 5;
+                throw_power = i.throw_power;
                 recovery_time = 0;
                 direction = i.direction;
                 coordinate = i.coordinate;
@@ -167,13 +178,22 @@ let is_in_bounds coord : bool =
                 img_src = "./pics/sprite_og.png";
                 who_threw = "mcup";
                 score = 0;
+                is_disabled = false
               }) in state.pillows <- (p::state.pillows); state
       | _ -> state
 
 (* helper function for update_state, checks for user press of keys and updates
  * corresponding movement. *)
 let update_pmovement (girl:Actors.info) keys =
-  if keys.up && (snd girl.coordinate >= 0) then (girl.direction <- 1;
+  let c = girl.coordinate in
+  if girl.is_disabled then begin match girl.direction with
+    | 1 -> girl.coordinate <- (fst c, snd c - girl.fly_speed)
+    | 2 -> girl.coordinate <- (fst c + girl.fly_speed, snd c)
+    | 3 -> girl.coordinate <- (fst c, snd c + girl.fly_speed)
+    | 4 -> girl.coordinate <- (fst c - girl.fly_speed, snd c)
+    | _ -> ()
+  end
+  else if keys.up && (snd girl.coordinate >= 0) then (girl.direction <- 1;
                      let c = girl.coordinate in girl.coordinate <- (fst c, snd c - girl.move_speed))
   else if keys.down && (snd girl.coordinate <= int_of_float (_BGSIZE -. _GIRLSIZE)) then (girl.direction <- 3;
                             let c = girl.coordinate in girl.coordinate <- (fst c, snd c + girl.move_speed))
@@ -208,6 +228,7 @@ let generate_pillow s =
       img_src = "./pics/sprite_og.png";
       who_threw = "na";
       score = 0;
+      is_disabled = false;
     }) in s.pillows <- (new_pillow :: s.pillows) else ()
 
 let check_pillow_spawn s =
@@ -324,19 +345,53 @@ let collision_handler c s =
             let _ = i.fly_speed <- fs in
             let _ = i.direction <- dir in
             let _ = s.bloom <- Bloom i in
-            let _ = if p_info.who_threw = "bloom" then i.score <- i.score + 1 in
-            s
+            let _ = begin match p_info.who_threw with
+              | "soap" -> begin match s.soap with
+                  | Soap so -> if so.is_disabled then ()
+                    else so.score <- so.score + 1
+                  | _ -> ()
+                end
+              | "mcup" -> begin match s.mcup with
+                  | Margarinecup m -> if m.is_disabled then ()
+                    else m.score <- m.score + 1
+                  | _ -> ()
+                end
+              | _ -> ()
+            end in s
           | Soap i ->
             let _ = i.fly_speed <- fs in
             let _ = i.direction <- dir in
             let _ = s.soap <- Soap i in
-            let _ = if p_info.who_threw = "soap" then i.score <- i.score + 1 in
-            s
+            let _ = begin match p_info.who_threw with
+              | "bloom" -> begin match s.bloom with
+                  | Bloom b -> if b.is_disabled then () else
+                      b.score <- b.score + 1
+                  | _ -> ()
+                end
+              | "mcup" -> begin match s.mcup with
+                  | Margarinecup m -> if m.is_disabled then () else
+                      m.score <- m.score + 1
+                  | _ -> ()
+                end
+              | _ -> ()
+            end in s
           | Margarinecup i ->
             let _ = i.fly_speed <- fs in
             let _ = i.direction <- dir in
             let _ = s.mcup <- Margarinecup i in
-            let _ = if p_info.who_threw = "mcup" then i.score <- i.score + 1 in s
+            let _ = begin match p_info.who_threw with
+              | "soap" -> begin match s.soap with
+                  | Soap so -> if so.is_disabled then () else
+                      so.score <- so.score + 1
+                  | _ -> ()
+                end
+              | "bloom" -> begin match s.bloom with
+                  | Bloom b -> if b.is_disabled then () else
+                        b.score <- b.score + 1
+                  | _ -> ()
+                end
+              | _ -> ()
+            end in s
         end
     end
   (* | GirlOnWall (g, w) ->
@@ -377,7 +432,7 @@ let rec update_pillow_movement s plist =
           | 4 -> ((fst p.coordinate) - p.fly_speed, (snd p.coordinate))
           | _ -> p.coordinate
         end in let _ = p.coordinate <- coord in
-        if is_in_bounds p.coordinate then
+        if is_in_bounds_pillow p.coordinate then
           update_pillow_movement s t
         else
           (s.pillows <- remove_pillow p plist; update_pillow_movement s t)

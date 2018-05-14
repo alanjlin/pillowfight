@@ -9,6 +9,8 @@ type info = {
   mutable img_src: string;
   mutable who_threw: string;
   mutable score: int;
+  mutable is_disabled: bool;
+  mutable last_disabled_time: float
 }
 
 type girl = Bloom of info | Soap of info | Margarinecup of info

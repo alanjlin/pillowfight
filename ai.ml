@@ -172,11 +172,13 @@ let attack_girl s ai girl bot agirl=
 let update_ai s ai =
   let s' = begin match s.bloom with
     | Bloom b ->
-      if b.has_pillow then attack_girl s ai "bloom" "b1" b
+      if b.is_disabled then ()
+      else if b.has_pillow then attack_girl s ai "bloom" "b1" b
       else move_to_closest_pillow "b1" ai b s;
       begin match s.soap with
         | Soap so ->
-          if so.has_pillow then attack_girl s ai "soap" "b2" so
+          if so.is_disabled then ()
+          else if so.has_pillow then attack_girl s ai "soap" "b2" so
           else move_to_closest_pillow "b2" ai so s; s
         | _ -> s
       end
