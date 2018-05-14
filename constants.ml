@@ -8,13 +8,29 @@ let _BGSIZE = 600.
 let _SBHEIGHT = 600.
 let _SBWIDTH = 150.
 
-let _BTHROWSPRITE = "./pics/bloom-throw.png"
-let _STHROWSPRITE = "./pics/soap-throw.png"
-let _MTHROWSPRITE = "./pics/mcup-throw.png"
+let _BTHROWSPRITELEFT = "./pics/bloom-throw-left.png"
+let _STHROWSPRITELEFT = "./pics/soap-throw-left.png"
+let _MTHROWSPRITELEFT = "./pics/mcup-throw-left.png"
+
+let _BTHROWSPRITERIGHT = "./pics/bloom-throw-right.png"
+let _STHROWSPRITERIGHT = "./pics/soap-throw-right.png"
+let _MTHROWSPRITERIGHT = "./pics/mcup-throw-right.png"
+
+let _BTHROWSPRITEUP = "./pics/bloom-throw-up.png"
+let _STHROWSPRITEUP = "./pics/soap-throw-up.png"
+let _MTHROWSPRITEUP = "./pics/mcup-throw-up.png"
+
+let _BTHROWSPRITEDOWN = "./pics/bloom-throw-down.png"
+let _STHROWSPRITEDOWN = "./pics/soap-throw-down.png"
+let _MTHROWSPRITEDOWN = "./pics/mcup-throw-down.png"
 
 let _BNORMALSPRITE = "./pics/bloom.png"
 let _SNORMALSPRITE = "./pics/soap.png"
 let _MNORMALSPRITE = "./pics/mcup.png"
+
+let _BSLEEPSPRITE = "./pics/bloom-sleep.png"
+let _SSLEEPSPRITE = "./pics/soap-sleep.png"
+let _MSLEEPSPRITE = "./pics/mcup-sleep.png"
 
 (* X = 660 will be centered for one digit *)
 let _BSCORECOORDX = 645.

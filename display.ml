@@ -6,8 +6,8 @@ module Html = Dom_html
 let js = Js.string
 let document = Html.document
 
-(* effects: [update_girl_imgsrc info context] assigns the proper img_src based on
-   if the girl represented by [info] has a pillow or not. If the girl does,
+(* effects: [update_girl_imgsrc info context] assigns the proper img_src based
+   on if the girl represented by [info] has a pillow or not. If the girl does,
    then the image will be set to the throwing sprite, otherwise it will be
    set to the normal sprite.
    returns: nothing
@@ -16,26 +16,42 @@ let document = Html.document
     - context : Dom_html.canvasRenderingContext2D Js.t
     - girl : Actors.girl *)
 let update_girl_imgsrc info context = match info with
-  | Bloom b -> if b.has_pillow then b.img_src <- _BTHROWSPRITE
-               else b.img_src <- _BNORMALSPRITE
-  | Soap so -> if so.has_pillow then so.img_src <- _STHROWSPRITE
-               else so.img_src <- _SNORMALSPRITE
-  | Margarinecup m -> if m.has_pillow then m.img_src <- _MTHROWSPRITE
-                      else m.img_src <- _MNORMALSPRITE
+  | Bloom b -> if b.has_pillow then
+      (if b.direction = 1 then b.img_src <- _BTHROWSPRITEUP
+      else if b.direction = 2 then b.img_src <- _BTHROWSPRITERIGHT
+      else if b.direction = 3 then b.img_src <- _BTHROWSPRITEDOWN
+      else b.img_src <- _BTHROWSPRITELEFT)
+    else if b.is_disabled then b.img_src <- _BSLEEPSPRITE
+    else b.img_src <- _BNORMALSPRITE
+  | Soap so -> if so.has_pillow then
+      (if so.direction = 1 then so.img_src <- _STHROWSPRITEUP
+       else if so.direction = 2 then so.img_src <- _STHROWSPRITERIGHT
+       else if so.direction = 3 then so.img_src <- _STHROWSPRITEDOWN
+       else so.img_src <- _STHROWSPRITELEFT)
+    else if so.is_disabled then so.img_src <- _SSLEEPSPRITE
+    else so.img_src <- _SNORMALSPRITE
+  | Margarinecup m -> if m.has_pillow then
+      (if m.direction = 1 then m.img_src <- _MTHROWSPRITEUP
+       else if m.direction = 2 then m.img_src <- _MTHROWSPRITERIGHT
+       else if m.direction = 3 then m.img_src <- _MTHROWSPRITEDOWN
+       else m.img_src <- _MTHROWSPRITELEFT)
+    else if m.is_disabled then m.img_src <- _MSLEEPSPRITE
+    else m.img_src <- _MNORMALSPRITE
 
-(* effects: [update_draw_actor context] draws the sprite image at its coordinates
+(* effects: [draw_updated_girl context] draws the sprite image at
+   its coordinates
   returns: nothing
   raises: nothing
   requires:
    - context : Dom_html.canvasRenderingContext2D Js.t
    - girl : Actors.girl
 *)
-let update_draw_actor girl context =
+let draw_updated_girl girl context =
   let _ = update_girl_imgsrc girl context in
   let img = (Dom_html.createImg Dom_html.document) in
   (* added the line below to type check *)
-  let girl' = match girl with Bloom b -> b | Soap so -> so | Margarinecup m -> m in
-  img##src <- (Js.string girl'.img_src);
+  let girl' = match girl with Bloom b -> b | Soap so -> so | Margarinecup m -> m
+  in img##src <- (Js.string girl'.img_src);
   context##drawImage_full(img, 0., 0., _GIRLSIZE, _GIRLSIZE,
                           float_of_int (fst girl'.coordinate),
                           float_of_int (snd girl'.coordinate),
@@ -149,8 +165,8 @@ let draw_state context state =
     draw_score context m.score "mcup";
     draw_time context (int_of_float (_GAMETIME -. state.time));
     (* changed from m to state.mcup to type check *)
-    update_draw_actor state.bloom context;
-    update_draw_actor state.soap context;
-    update_draw_actor state.mcup context;
+    draw_updated_girl state.bloom context;
+    draw_updated_girl state.soap context;
+    draw_updated_girl state.mcup context;
     draw_pillow context state;
   | _ -> failwith "not possible";

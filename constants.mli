@@ -17,10 +17,26 @@ val _TIMECOORDX : float
 val _TIMECOORDY : float
 val _GAMETIME : float
 
-val _BTHROWSPRITE : string
-val _STHROWSPRITE : string
-val _MTHROWSPRITE : string
+val _BTHROWSPRITELEFT : string
+val _STHROWSPRITELEFT : string
+val _MTHROWSPRITELEFT : string
+
+val _BTHROWSPRITERIGHT : string
+val _STHROWSPRITERIGHT : string
+val _MTHROWSPRITERIGHT : string
+
+val _BTHROWSPRITEUP : string
+val _STHROWSPRITEUP : string
+val _MTHROWSPRITEUP : string
+
+val _BTHROWSPRITEDOWN : string
+val _STHROWSPRITEDOWN : string
+val _MTHROWSPRITEDOWN : string
 
 val _BNORMALSPRITE : string
 val _SNORMALSPRITE : string
 val _MNORMALSPRITE : string
+
+val _BSLEEPSPRITE : string
+val _SSLEEPSPRITE : string
+val _MSLEEPSPRITE : string
