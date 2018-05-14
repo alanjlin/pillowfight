@@ -10,6 +10,8 @@ type ai = {
   mutable b2choice: bool;
 }
 
+(* [init_ai] initializes the information required to make intervaled
+   decisions.*)
 let init_ai = {
     b1time_of_last_switch = Unix.gettimeofday ();
     b1interval = 0.;
@@ -34,6 +36,8 @@ let twochoice u =
   let i = Random.int 2 in
   if i = 0 then true else false
 
+(* [reset_time] resets the random interval and updates the
+ * last time that it has switched of [bot] in [ai]. *)
 let reset_time bot ai =
   if bot = "b1"
   then (ai.b1interval <- Random.float 2. +. 1.;
@@ -41,7 +45,8 @@ let reset_time bot ai =
   else (ai.b2interval <- Random.float 2. +. 1.;
         ai.b2time_of_last_switch <- Unix.gettimeofday ())
 
-(* Returns: true if time to switch movement, false if not. *)
+(* [time_to_switch] determines whether or not it is time to switch behavior.
+ * Returns: true if time to switch movement, false if not. *)
 let time_to_switch bot (ai : ai) : bool =
   if (bot = "b1" && (get_time_diff ai.b1time_of_last_switch) > ai.b1interval)
   then (reset_time bot ai; true)
@@ -50,10 +55,17 @@ let time_to_switch bot (ai : ai) : bool =
   then (reset_time bot ai; true)
   else false
 
+(* [toggle_choice] changes the bot's choice to the other binary. *)
 let toggle_choice bot ai =
   if bot = "b1" then ai.b1choice <- not ai.b1choice
   else ai.b2choice <- not ai.b2choice
 
+(* [ai_decision_cycle] is the core of the AI's "deciding" behavior. All
+ * choices that this AI makes can be abstracted to a binary choice
+ * i.e. whether or not to go on the x or y axis first, which of the two other
+ * girls to target, etc.
+ * Specifically, ai_decision_cycle changes decisions at a random time
+ * from 1-3 seconds. *)
 let ai_decision_cycle bot ai : bool =
   if (bot = "b1" && time_to_switch bot ai)
   then (let c = twochoice () in ai.b1choice <- c; c)
@@ -103,7 +115,9 @@ let move_to_closest_pillow bot ai (girl: info) s =
        girl.coordinate <- (fst cgirl, snd cgirl - girl.move_speed))
     else toggle_choice bot ai)
 
-(* [move_to_girl] increments [agirl] movement to [tgirl]*)
+(* [move_to_girl] increments [agirl] movement to [tgirl]. The choice of
+ * whether or not to move on the x or y axis is handles by the
+ * [ai_decision_cycle]. *)
 let move_to_girl bot ai agirl tgirl =
   let ctgirl = tgirl.coordinate in
   let cagirl = agirl.coordinate in
@@ -124,6 +138,8 @@ let move_to_girl bot ai agirl tgirl =
         agirl.coordinate <- (fst cagirl, snd cagirl - agirl.move_speed))
      else toggle_choice bot ai)
 
+(* [check_throw] checks whether or not a girl should throw a pillow in
+ * any given direction. *)
 let check_throw s girl ai (agirl: info) (tgirl: info) =
   let ax = fst agirl.coordinate in
   let ay = snd agirl.coordinate in
@@ -139,18 +155,20 @@ let check_throw s girl ai (agirl: info) (tgirl: info) =
         else (agirl.direction <- 2; ignore (throw_pillow girl s) ))
   else ()
 
+(* [attack_girl] targets a girl randomly and goes to her, always checking if
+ * she's in range to throw a pillow at her. *)
 let attack_girl s ai girl bot agirl=
   match girl with
   | "bloom" -> begin match ai.b1choice with
       | true -> begin match s.mcup with
           | Margarinecup m ->
-            if m.is_disabled then ai.b1choice <- not ai.b1choice else
+            if m.is_disabled then toggle_choice bot ai else
             check_throw s girl ai agirl m; move_to_girl bot ai agirl m
           | _ -> ()
         end
       | false -> begin match s.soap with
           | Soap so ->
-            if so.is_disabled then ai.b1choice <- not ai.b1choice else
+            if so.is_disabled then toggle_choice bot ai else
             check_throw s girl ai agirl so; move_to_girl bot ai agirl so
           | _ -> ()
         end
@@ -158,20 +176,22 @@ let attack_girl s ai girl bot agirl=
   | "soap" -> begin match ai.b2choice with
       | true -> begin match s.mcup with
           | Margarinecup m ->
-            if m.is_disabled then ai.b2choice <- not ai.b2choice else
+            if m.is_disabled then toggle_choice bot ai else
             check_throw s girl ai agirl m; move_to_girl bot ai agirl m
           | _ -> ()
         end
       | false -> begin match s.bloom with
           | Bloom b ->
-            if b.is_disabled then ai.b2choice <- not ai.b2choice else
+            if b.is_disabled then toggle_choice bot ai else
             check_throw s girl ai agirl b; move_to_girl bot ai agirl b
           | _ -> ()
         end
     end
-  | "mcup" -> ()
+  | "mcup" -> () (* if bot is ever mcup *)
   | _ -> ()
 
+(* [Disabled_movement] handles girl flying if she is hit by a pillow.
+ * Also disables AI movement/behavior if she is disabled.*)
 let disabled_movement girl =
   let c = girl.coordinate in
   if is_in_bounds_girl girl.coordinate
@@ -184,7 +204,12 @@ let disabled_movement girl =
   end
   else ()
 
-
+(* [update_ai] consolidates all AI functionality into one method.
+ * Returns the AI after one "frame" of the AI. The behavior of an AI can
+ * be summarized as follows: If the AI has no pillow, and there is a pillow
+ * on the screen, then it randomly chooses a path to get to the pillow.
+ * If the AI has a pillow, then it randomly chooses a non-disabled girl to
+ * target and attacks her. Otherwise, she does nothing (sits there).*)
 let update_ai s ai =
   let s' = begin match s.bloom with
     | Bloom b -> check_still_disabled b;

@@ -63,6 +63,8 @@ val collision_handler: collision -> st -> st
 
 (* val update_all: Dom_html.canvasRenderingContext2D Js.t -> unit *)
 
+(* The following methods' documentation is contained in the .ml file. *)
+
 val is_in_bounds_girl: (int * int) -> bool
 
 val check_still_disabled: info -> unit

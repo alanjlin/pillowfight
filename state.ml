@@ -26,6 +26,7 @@ type st = {
   mutable game_over: bool;
 }
 
+(* [player_keys] represents the keys that the player presses. *)
 let player_keys = {
   up = false;
   down = false;
@@ -34,6 +35,7 @@ let player_keys = {
   space = false;
 }
 
+(* [init_bloom] initializes Bloom at the initial state. *)
 let init_bloom =  Bloom {
     move_speed = 4;
     fly_speed = 8;
@@ -49,6 +51,7 @@ let init_bloom =  Bloom {
     last_time_disabled = 0.;
   }
 
+(* [init_soap] initializes Soap at the initial state. *)
 let init_soap = Soap {
     move_speed = 4;
     fly_speed = 8;
@@ -64,6 +67,7 @@ let init_soap = Soap {
     last_time_disabled = 0.;
   }
 
+(* [init_mcup] initializes Margarinecup at the initial state. *)
 let init_mcup = Margarinecup {
     move_speed = 4;
     fly_speed = 8;
@@ -79,12 +83,13 @@ let init_mcup = Margarinecup {
     last_time_disabled = 0.;
   }
 
+(* [init_pillow] is the initializes a pillow for testing purposes. *)
 let init_pillow = Regular {
-    move_speed = 1;
+    move_speed = 0;
     fly_speed = 0;
-    throw_power = 1;
-    recovery_time = 3;
-    direction = 1;
+    throw_power = 0;
+    recovery_time = 5;
+    direction = 0;
     coordinate = (50, 100);
     has_pillow = false;
     img_src = "./pics/sprite_og.png";
@@ -94,8 +99,11 @@ let init_pillow = Regular {
     last_time_disabled = 0.;
   }
 
+(* [reset_last_time] updates any reference to the time of day to current time.
+ * [Effects]: sets [lt] to current time of day.*)
 let reset_last_time lt = lt := Unix.gettimeofday ()
 
+(* [init_st] is the state when the game first begins. initializes variables.*)
 let init_st = {
   bloom = init_bloom;
   soap = init_soap;
@@ -109,10 +117,16 @@ let init_st = {
   game_over = false;
 }
 
+(* [pillows] is a getter method.
+ * [Returns]: list of pillows in [s].*)
 let pillows s = s.pillows
 
+(* [collisions] is a getter method.
+ * [Returns]: list of current collisions in [s].*)
 let collisions s = s.collisions
 
+(* [time] is a getter method.
+ * [Returns]: current game time.*)
 let time s = s.time
 
 (* [Requires]: lt is [last_time]
@@ -120,12 +134,17 @@ let time s = s.time
 let get_time_diff lt =
   (Unix.gettimeofday ()) -. lt
 
-(* Checks if a given set of coordinates fits within the background size. *)
+(* [is_in_bounds_pillow] Checks if a pillow's coordinates fits within
+   the background size.
+   [Returns]: true if a pillow is in bounds, false otherwise.*)
 let is_in_bounds_pillow coord : bool =
   if fst coord > -5 && fst coord < int_of_float (_BGSIZE -. _PILLOWSIZE +. 5.)
      && snd coord > -5 && snd coord < int_of_float (_BGSIZE -. _PILLOWSIZE +. 5.)
   then true else false
 
+(* [is_in_bounds_girl] Checks if a girl's coordinates fits within
+   the background size.
+   [Returns]: true if a girl is in bounds, false otherwise.*)
 let is_in_bounds_girl coord : bool =
   if fst coord > -5 && fst coord < int_of_float (_BGSIZE -. _GIRLSIZE +. 5.)
      && snd coord > -5 && snd coord < int_of_float (_BGSIZE -. _GIRLSIZE +. 5.)
@@ -223,9 +242,13 @@ let update_pthrow state (girl: girl) keys =
     begin match girl with
       | Bloom i -> if i.has_pillow then throw_pillow "bloom" state else state
       | Soap i -> if i.has_pillow then throw_pillow "soap" state else state
-      | Margarinecup i -> if i.has_pillow then throw_pillow "mcup" state else state
+      | Margarinecup i ->
+        if i.has_pillow then throw_pillow "mcup" state else state
     end else state
 
+(* [generate_pillow] generates 1 stationary pillow per time it is called. the
+ * position at which it is generated is random.
+ * [Effects]: adds a pillow to pillow_list in [s]. *)
 let generate_pillow s =
   if List.length s.pillows < 7 then
   let new_pillow = Regular ({
@@ -244,6 +267,9 @@ let generate_pillow s =
       last_time_disabled = 0.;
     }) in s.pillows <- (new_pillow :: s.pillows) else ()
 
+(* [check_pillow_spawn] spawns a pillow every 1.2 +/- 1 seconds.
+ * resets random time after each spawn.
+ * [Effects]: spawns a pillow every 1.2 +/- 1 seconds. *)
 let check_pillow_spawn s =
   if s.random_time = 0.
   then (s.random_time <- ((Random.float 2.0) +. 0.2))
@@ -251,9 +277,14 @@ let check_pillow_spawn s =
   then (generate_pillow s; s.last_time_of_pillow_spawn <- s.time )
   else ()
 
+(* [update_time] is a helper method to update the game time.
+ * [Effects]: Gets time difference from time of game start and
+ * sets time to that.*)
 let update_time s =
   s.time <- get_time_diff s.game_start
 
+(* [check_game_over] updates time (adds to the game's timer) and toggles
+ * game_over indication to tell the main game loop to exit loop. *)
 let check_game_over st =
   update_time st; if st.time >= 120. then
   st.game_over <- true
@@ -322,8 +353,8 @@ let rec remove_pillow it plst =
 
 (* effects: [collisionHandler cl st] updates the state depending on the collision.
    For example, if a girl collides with a pillow, the state should be updated
-   with the girl holding the pillow. Another example: when the girls collides
-   with the bed, the girl should slow down.
+   with the girl holding the pillow. If a moving pillow collides with a girl,
+   then she flies backwards and gets disabled (no player controls).
    returns: the updated state *)
 let collision_handler c s =
   match c with
@@ -431,18 +462,6 @@ let collision_handler c s =
             end in s
         end
     end
-  (* | GirlOnWall (g, w) ->
-    begin match g with
-      | Bloom i ->
-        let _ = i.fly_speed <= 0 in
-        let _ = s.bloom = Bloom i in s
-      | Soap i ->
-        let _ = i.fly_speed <= 0 in
-        let _ = s.soap = Soap i in s
-      | Margarinecup i ->
-        let _ = i.fly_speed <= 0 in
-        let _ = s.mcup = Margarinecup i in s
-     end *)
 
 (*[coll_list_proc clist state] is the state with the collisions in state
   processed *)
@@ -475,6 +494,10 @@ let rec update_pillow_movement s plist =
           (s.pillows <- remove_pillow p s.pillows; update_pillow_movement s t)
     end
 
+(* [Check_still_disabled] constantly checks if it's been more than [girl]'s'
+ * recovery since the last time she's been disabled.
+ * [Effects]: toggles is_disabled to false if girl is disabled and it's been
+ * more than her recovery time. *)
 let check_still_disabled (girl: Actors.info) =
   if girl.is_disabled &&
      (get_time_diff girl.last_time_disabled > float_of_int girl.recovery_time)
@@ -494,6 +517,11 @@ let update_st s =
       in update_collisions s'
     | _ -> s
 
+(* [Requires]: [mcup], [bloom], and [soap] are girl components in the state
+ * after the game is over.
+ * [Returns]: "mcup" if mcup has the highest score, "bloom" if bloom has the
+ * highest score, and "soap" if soap has the highest score. If two people
+ * have the same score, then returns "tie"*)
 let highest_score mcup bloom soap =
   begin
     match mcup, bloom, soap with
@@ -505,16 +533,8 @@ let highest_score mcup bloom soap =
     |_, _, _ -> failwith "shouldn't happen"
   end
 
-(* let rec update_all context =
-  let rec loop st =
-    let st' = update_st st in
-    Display.draw_state context;
-    ignore (Dom_html.window##requestAnimationFrame(
-      Js.wrap_callback (fun (t:float) -> loop st')
-    ))
-in loop init_st *)
-
-(* Keydown event handler translates a key press *)
+(* [keydown] translates a keycode from the eventlistener to player_keys
+ * for a pressed key. *)
 let keydown event =
   let () = match event##keyCode with
   | 38 -> player_keys.up <- true
@@ -525,7 +545,8 @@ let keydown event =
   | _ -> ()
   in Js._true
 
-(* Keyup event handler translates a key release *)
+(* [keydown] translates a keycode from the eventlistener to player_keys
+ * for a released key. *)
 let keyup event =
   let () = match event##keyCode with
   | 38 -> player_keys.up <- false
