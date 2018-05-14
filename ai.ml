@@ -144,11 +144,13 @@ let attack_girl s ai girl bot agirl=
   | "bloom" -> begin match ai.b1choice with
       | true -> begin match s.mcup with
           | Margarinecup m ->
+            if m.is_disabled then ai.b1choice <- not ai.b1choice else
             check_throw s girl ai agirl m; move_to_girl bot ai agirl m
           | _ -> ()
         end
       | false -> begin match s.soap with
           | Soap so ->
+            if so.is_disabled then ai.b1choice <- not ai.b1choice else
             check_throw s girl ai agirl so; move_to_girl bot ai agirl so
           | _ -> ()
         end
@@ -156,11 +158,13 @@ let attack_girl s ai girl bot agirl=
   | "soap" -> begin match ai.b2choice with
       | true -> begin match s.mcup with
           | Margarinecup m ->
+            if m.is_disabled then ai.b2choice <- not ai.b2choice else
             check_throw s girl ai agirl m; move_to_girl bot ai agirl m
           | _ -> ()
         end
       | false -> begin match s.bloom with
           | Bloom b ->
+            if b.is_disabled then ai.b2choice <- not ai.b2choice else
             check_throw s girl ai agirl b; move_to_girl bot ai agirl b
           | _ -> ()
         end
@@ -189,7 +193,7 @@ let update_ai s ai =
       else move_to_closest_pillow "b1" ai b s;
       begin match s.soap with
         | Soap so -> check_still_disabled so;
-          if so.is_disabled then disabled_movement b
+          if so.is_disabled then disabled_movement so
           else if so.has_pillow then attack_girl s ai "soap" "b2" so
           else move_to_closest_pillow "b2" ai so s; s
         | _ -> s
