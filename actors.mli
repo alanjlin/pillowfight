@@ -11,6 +11,7 @@ type info = {
   mutable who_threw: string;
   mutable score: int;
   mutable is_disabled: bool;
+  mutable last_time_disabled: float;
 }
 
 (* variant representing the types of girl *)

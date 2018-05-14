@@ -75,9 +75,8 @@ let rec find_closest_pillow cgirl clist acc =
     else find_closest_pillow cgirl t acc
 
 (* [move_to_closest_pillow] moves a girl with info [girl] in the state s to
- * the nearest pillow. For now, this function gets x right first, then y.
-   NOTE: consider choosing x or y first randomly, or switching after a random
-   amount of time.
+ * the nearest pillow. Chooses whether or not to go in the x or y direction
+ * randomly after random amounts of time.
  * Requires: [s] is the state of the game, [girl] is the info of the desired
  * girl to automate move.*)
 let move_to_closest_pillow bot ai (girl: info) s =
@@ -169,15 +168,28 @@ let attack_girl s ai girl bot agirl=
   | "mcup" -> ()
   | _ -> ()
 
+let disabled_movement girl =
+  let c = girl.coordinate in
+  if is_in_bounds_girl girl.coordinate
+  then begin match girl.direction with
+    | 1 -> girl.coordinate <- (fst c, snd c - girl.fly_speed)
+    | 2 -> girl.coordinate <- (fst c + girl.fly_speed, snd c)
+    | 3 -> girl.coordinate <- (fst c, snd c + girl.fly_speed)
+    | 4 -> girl.coordinate <- (fst c - girl.fly_speed, snd c)
+    | _ -> ()
+  end
+  else ()
+
+
 let update_ai s ai =
   let s' = begin match s.bloom with
-    | Bloom b ->
-      if b.is_disabled then ()
+    | Bloom b -> check_still_disabled b;
+      if b.is_disabled then disabled_movement b
       else if b.has_pillow then attack_girl s ai "bloom" "b1" b
       else move_to_closest_pillow "b1" ai b s;
       begin match s.soap with
-        | Soap so ->
-          if so.is_disabled then ()
+        | Soap so -> check_still_disabled so;
+          if so.is_disabled then disabled_movement b
           else if so.has_pillow then attack_girl s ai "soap" "b2" so
           else move_to_closest_pillow "b2" ai so s; s
         | _ -> s

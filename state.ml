@@ -45,6 +45,7 @@ let init_bloom =  Bloom {
     who_threw = "na";
     score = 0;
     is_disabled = false;
+    last_time_disabled = 0.;
   }
 
 let init_soap = Soap {
@@ -59,6 +60,7 @@ let init_soap = Soap {
     who_threw = "na";
     score = 0;
     is_disabled = false;
+    last_time_disabled = 0.;
   }
 
 let init_mcup = Margarinecup {
@@ -73,6 +75,7 @@ let init_mcup = Margarinecup {
     who_threw = "na";
     score = 0;
     is_disabled = false;
+    last_time_disabled = 0.;
   }
 
 let init_pillow = Regular {
@@ -87,6 +90,7 @@ let init_pillow = Regular {
     who_threw = "na";
     score = 0;
     is_disabled = false;
+    last_time_disabled = 0.;
   }
 
 let reset_last_time lt = lt := Unix.gettimeofday ()
@@ -144,7 +148,8 @@ let is_in_bounds_girl coord : bool =
             img_src = "./pics/sprite_og.png";
             who_threw = "bloom";
             score = 0;
-            is_disabled = false
+            is_disabled = false;
+            last_time_disabled = 0.;
           }) in state.pillows <- (p::state.pillows); state
   | _ -> state
     else if girl = "soap" then
@@ -161,7 +166,8 @@ let is_in_bounds_girl coord : bool =
                 img_src = "./pics/sprite_og.png";
                 who_threw = "soap";
                 score = 0;
-                is_disabled = false
+                is_disabled = false;
+                last_time_disabled = 0.;
               }) in state.pillows <- (p::state.pillows); state
   | _ -> state
     else
@@ -178,7 +184,8 @@ let is_in_bounds_girl coord : bool =
                 img_src = "./pics/sprite_og.png";
                 who_threw = "mcup";
                 score = 0;
-                is_disabled = false
+                is_disabled = false;
+                last_time_disabled = 0.;
               }) in state.pillows <- (p::state.pillows); state
       | _ -> state
 
@@ -186,13 +193,16 @@ let is_in_bounds_girl coord : bool =
  * corresponding movement. *)
 let update_pmovement (girl:Actors.info) keys =
   let c = girl.coordinate in
-  if girl.is_disabled then begin match girl.direction with
+  if girl.is_disabled && is_in_bounds_girl girl.coordinate
+  then begin match girl.direction with
     | 1 -> girl.coordinate <- (fst c, snd c - girl.fly_speed)
     | 2 -> girl.coordinate <- (fst c + girl.fly_speed, snd c)
     | 3 -> girl.coordinate <- (fst c, snd c + girl.fly_speed)
     | 4 -> girl.coordinate <- (fst c - girl.fly_speed, snd c)
     | _ -> ()
   end
+  else if girl.is_disabled && not (is_in_bounds_girl girl.coordinate)
+  then ()
   else if keys.up && (snd girl.coordinate >= 0) then (girl.direction <- 1;
                      let c = girl.coordinate in girl.coordinate <- (fst c, snd c - girl.move_speed))
   else if keys.down && (snd girl.coordinate <= int_of_float (_BGSIZE -. _GIRLSIZE)) then (girl.direction <- 3;
@@ -229,6 +239,7 @@ let generate_pillow s =
       who_threw = "na";
       score = 0;
       is_disabled = false;
+      last_time_disabled = 0.;
     }) in s.pillows <- (new_pillow :: s.pillows) else ()
 
 let check_pillow_spawn s =
@@ -347,16 +358,20 @@ let collision_handler c s =
             let _ = s.bloom <- Bloom i in
             let _ = begin match p_info.who_threw with
               | "soap" -> begin match s.soap with
-                  | Soap so -> if so.is_disabled then ()
-                    else so.score <- so.score + 1
+                  | Soap so -> if i.is_disabled then ()
+                    else so.score <- so.score + 1;
+                    i.is_disabled <- true;
+                    i.last_time_disabled <- Unix.gettimeofday ();
                   | _ -> ()
                 end
               | "mcup" -> begin match s.mcup with
-                  | Margarinecup m -> if m.is_disabled then ()
-                    else m.score <- m.score + 1
+                  | Margarinecup m -> if i.is_disabled then ()
+                    else m.score <- m.score + 1;
+                    i.is_disabled <- true;
+                    i.last_time_disabled <- Unix.gettimeofday ();
                   | _ -> ()
                 end
-              | _ -> ()
+              | _ -> () (* if collision is with itself *)
             end in s
           | Soap i ->
             let _ = i.fly_speed <- fs in
@@ -364,16 +379,20 @@ let collision_handler c s =
             let _ = s.soap <- Soap i in
             let _ = begin match p_info.who_threw with
               | "bloom" -> begin match s.bloom with
-                  | Bloom b -> if b.is_disabled then () else
-                      b.score <- b.score + 1
+                  | Bloom b -> if i.is_disabled then () else
+                      b.score <- b.score + 1;
+                      i.is_disabled <- true;
+                      i.last_time_disabled <- Unix.gettimeofday ();
                   | _ -> ()
                 end
               | "mcup" -> begin match s.mcup with
-                  | Margarinecup m -> if m.is_disabled then () else
-                      m.score <- m.score + 1
+                  | Margarinecup m -> if i.is_disabled then () else
+                      m.score <- m.score + 1;
+                      i.is_disabled <- true;
+                      i.last_time_disabled <- Unix.gettimeofday ();
                   | _ -> ()
                 end
-              | _ -> ()
+              | _ -> () (* if collision is with itself *)
             end in s
           | Margarinecup i ->
             let _ = i.fly_speed <- fs in
@@ -381,16 +400,20 @@ let collision_handler c s =
             let _ = s.mcup <- Margarinecup i in
             let _ = begin match p_info.who_threw with
               | "soap" -> begin match s.soap with
-                  | Soap so -> if so.is_disabled then () else
-                      so.score <- so.score + 1
+                  | Soap so -> if i.is_disabled then () else
+                      so.score <- so.score + 1;
+                      i.is_disabled <- true;
+                      i.last_time_disabled <- Unix.gettimeofday ();
                   | _ -> ()
                 end
               | "bloom" -> begin match s.bloom with
-                  | Bloom b -> if b.is_disabled then () else
-                        b.score <- b.score + 1
+                  | Bloom b -> if i.is_disabled then () else
+                      b.score <- b.score + 1;
+                      i.is_disabled <- true;
+                      i.last_time_disabled <- Unix.gettimeofday ();
                   | _ -> ()
                 end
-              | _ -> ()
+              | _ -> () (* if collision is with itself *)
             end in s
         end
     end
@@ -438,6 +461,12 @@ let rec update_pillow_movement s plist =
           (s.pillows <- remove_pillow p plist; update_pillow_movement s t)
     end
 
+let check_still_disabled (girl: Actors.info) =
+  if girl.is_disabled &&
+     (get_time_diff girl.last_time_disabled > float_of_int girl.recovery_time)
+  then girl.is_disabled <- false
+  else ()
+
 (* [update_st] updates the state after every frame of the game. It consolidates
  * all helper functions above into a nice, readable, state-in-state-out
  * function that will be used by update_all to coordinate with the frontend. *)
@@ -445,7 +474,8 @@ let update_st s =
   let _ = update_time s in let _ = check_pillow_spawn s in
   let _ = update_pillow_movement s s.pillows in
     match s.mcup with
-    | Margarinecup m -> let _ =  update_pmovement m player_keys
+    | Margarinecup m -> let _ = check_still_disabled m in
+      let _ = update_pmovement m player_keys
       in let s' = update_pthrow s (Margarinecup m) player_keys
       in update_collisions s'
     | _ -> s
