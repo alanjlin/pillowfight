@@ -122,13 +122,13 @@ let get_time_diff lt =
 
 (* Checks if a given set of coordinates fits within the background size. *)
 let is_in_bounds_pillow coord : bool =
-  if fst coord >= 0 && fst coord <= int_of_float (_BGSIZE -. _PILLOWSIZE)
-     && snd coord >= 0 && snd coord <= int_of_float (_BGSIZE -. _PILLOWSIZE)
+  if fst coord > -5 && fst coord < int_of_float (_BGSIZE -. _PILLOWSIZE +. 5.)
+     && snd coord > -5 && snd coord < int_of_float (_BGSIZE -. _PILLOWSIZE +. 5.)
   then true else false
 
 let is_in_bounds_girl coord : bool =
-  if fst coord >= 0 && fst coord <= int_of_float (_BGSIZE -. _GIRLSIZE)
-     && snd coord >= 0 && snd coord <= int_of_float (_BGSIZE -. _GIRLSIZE)
+  if fst coord > -5 && fst coord < int_of_float (_BGSIZE -. _GIRLSIZE +. 5.)
+     && snd coord > -5 && snd coord < int_of_float (_BGSIZE -. _GIRLSIZE +. 5.)
   then true else false
 
   (*[throw_pillow girl state] is the state after the girl has thrown a pillow.
