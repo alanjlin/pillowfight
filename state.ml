@@ -244,7 +244,7 @@ let generate_pillow s =
 
 let check_pillow_spawn s =
   if s.random_time = 0.
-  then (s.random_time <- ((Random.float 3.) +. 1.))
+  then (s.random_time <- ((Random.float 2.0) +. 0.2))
   else if (s.time -. s.last_time_of_pillow_spawn >= s.random_time)
   then (generate_pillow s; s.last_time_of_pillow_spawn <- s.time )
   else ()
@@ -309,7 +309,9 @@ let rec remove_pillow it plst =
   | h::t ->
     match h with
     | Regular i ->
-        if it = i then remove_pillow it t
+      if fst it.coordinate = fst i.coordinate &&
+         snd i.coordinate = snd i.coordinate
+      then remove_pillow it t
         else (Regular i)::(remove_pillow it t)
 
 (* effects: [collisionHandler cl st] updates the state depending on the collision.
@@ -352,7 +354,7 @@ let collision_handler c s =
         let fs = p_info.fly_speed in
         let dir = p_info.direction in
         begin match g with
-          | Bloom i ->
+          | Bloom i -> if i.is_disabled then s else
             let _ = i.fly_speed <- fs in
             let _ = i.direction <- dir in
             let _ = s.bloom <- Bloom i in
@@ -373,7 +375,7 @@ let collision_handler c s =
                 end
               | _ -> () (* if collision is with itself *)
             end in s
-          | Soap i ->
+          | Soap i -> if i.is_disabled then s else
             let _ = i.fly_speed <- fs in
             let _ = i.direction <- dir in
             let _ = s.soap <- Soap i in
@@ -394,7 +396,7 @@ let collision_handler c s =
                 end
               | _ -> () (* if collision is with itself *)
             end in s
-          | Margarinecup i ->
+          | Margarinecup i -> if i.is_disabled then s else
             let _ = i.fly_speed <- fs in
             let _ = i.direction <- dir in
             let _ = s.mcup <- Margarinecup i in
@@ -458,7 +460,7 @@ let rec update_pillow_movement s plist =
         if is_in_bounds_pillow p.coordinate then
           update_pillow_movement s t
         else
-          (s.pillows <- remove_pillow p plist; update_pillow_movement s t)
+          (s.pillows <- remove_pillow p s.pillows; update_pillow_movement s t)
     end
 
 let check_still_disabled (girl: Actors.info) =
