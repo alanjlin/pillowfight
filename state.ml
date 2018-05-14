@@ -370,6 +370,7 @@ let collision_handler c s =
                     else so.score <- so.score + 1;
                     i.is_disabled <- true;
                     i.last_time_disabled <- Unix.gettimeofday ();
+                    i.has_pillow <- false;
                   | _ -> ()
                 end
               | "mcup" -> begin match s.mcup with
@@ -377,6 +378,7 @@ let collision_handler c s =
                     else m.score <- m.score + 1;
                     i.is_disabled <- true;
                     i.last_time_disabled <- Unix.gettimeofday ();
+                    i.has_pillow <- false;
                   | _ -> ()
                 end
               | _ -> () (* if collision is with itself *)
@@ -391,6 +393,7 @@ let collision_handler c s =
                       b.score <- b.score + 1;
                       i.is_disabled <- true;
                       i.last_time_disabled <- Unix.gettimeofday ();
+                      i.has_pillow <- false;
                   | _ -> ()
                 end
               | "mcup" -> begin match s.mcup with
@@ -398,6 +401,7 @@ let collision_handler c s =
                       m.score <- m.score + 1;
                       i.is_disabled <- true;
                       i.last_time_disabled <- Unix.gettimeofday ();
+                      i.has_pillow <- false;
                   | _ -> ()
                 end
               | _ -> () (* if collision is with itself *)
@@ -412,6 +416,7 @@ let collision_handler c s =
                       so.score <- so.score + 1;
                       i.is_disabled <- true;
                       i.last_time_disabled <- Unix.gettimeofday ();
+                      i.has_pillow <- false;
                   | _ -> ()
                 end
               | "bloom" -> begin match s.bloom with
@@ -419,6 +424,7 @@ let collision_handler c s =
                       b.score <- b.score + 1;
                       i.is_disabled <- true;
                       i.last_time_disabled <- Unix.gettimeofday ();
+                      i.has_pillow <- false;
                   | _ -> ()
                 end
               | _ -> () (* if collision is with itself *)
@@ -491,7 +497,7 @@ let update_st s =
 let highest_score mcup bloom soap =
   begin
     match mcup, bloom, soap with
-    |Margarinecup m, Bloom b, Soap s ->
+    | Margarinecup m, Bloom b, Soap s ->
       if m.score > b.score && m.score > s.score then "mcup"
       else if b.score > m.score && b.score > s.score then "bloom"
       else if s.score > m.score && s.score > b.score then "soap"
