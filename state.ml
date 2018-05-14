@@ -22,7 +22,8 @@ type st = {
   mutable time: float;
   mutable last_time_of_pillow_spawn: float;
   mutable random_time: float;
-  game_start: float
+  game_start: float;
+  mutable game_over: bool;
 }
 
 let player_keys = {
@@ -104,7 +105,8 @@ let init_st = {
   time = 0.;
   last_time_of_pillow_spawn = 0.;
   random_time = 0.;
-  game_start = Unix.gettimeofday ()
+  game_start = Unix.gettimeofday ();
+  game_over = false;
 }
 
 let pillows s = s.pillows
@@ -116,7 +118,7 @@ let time s = s.time
 (* [Requires]: lt is [last_time]
  * [Returns]: Difference between current time and last time. *)
 let get_time_diff lt =
-   (Unix.gettimeofday ()) -. lt
+  (Unix.gettimeofday ()) -. lt
 
 (* Checks if a given set of coordinates fits within the background size. *)
 let is_in_bounds_pillow coord : bool =
@@ -251,6 +253,10 @@ let check_pillow_spawn s =
 
 let update_time s =
   s.time <- get_time_diff s.game_start
+
+let check_game_over st =
+  update_time st; if st.time >= 120. then
+  st.game_over <- true
 
 (*[collision_detector s] determines whether there is a collision given the
   information of the two objects. returns true if there is a collision, false
@@ -473,7 +479,7 @@ let check_still_disabled (girl: Actors.info) =
  * all helper functions above into a nice, readable, state-in-state-out
  * function that will be used by update_all to coordinate with the frontend. *)
 let update_st s =
-  let _ = update_time s in let _ = check_pillow_spawn s in
+  let _ = check_game_over s in let _ = check_pillow_spawn s in
   let _ = update_pillow_movement s s.pillows in
     match s.mcup with
     | Margarinecup m -> let _ = check_still_disabled m in
@@ -481,6 +487,17 @@ let update_st s =
       in let s' = update_pthrow s (Margarinecup m) player_keys
       in update_collisions s'
     | _ -> s
+
+let highest_score mcup bloom soap =
+  begin
+    match mcup, bloom, soap with
+    |Margarinecup m, Bloom b, Soap s ->
+      if m.score > b.score && m.score > s.score then "mcup"
+      else if b.score > m.score && b.score > s.score then "bloom"
+      else if s.score > m.score && s.score > b.score then "soap"
+      else "tie"
+    |_, _, _ -> failwith "shouldn't happen"
+  end
 
 (* let rec update_all context =
   let rec loop st =

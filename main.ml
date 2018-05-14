@@ -5,6 +5,16 @@ module Html = Dom_html
 let rec update_all context =
   let rec loop st ai = let st'' = Ai.update_ai st ai in
     let st' = State.update_st st'' in
+    if st'.game_over = true then
+      begin
+        match State.highest_score st'.mcup st'.bloom st'.soap with
+        | "mcup" -> Display.mcup_win context; exit 0
+        | "bloom" -> Display.bloom_win context; exit 0
+        | "soap" -> Display.soap_win context; exit 0
+        | "tie" -> Display.tie_win context; exit 0
+        | _ -> print_endline "failed"
+      end
+    else
     Display.draw_state context st';
     ignore (Html.window##requestAnimationFrame(
       Js.wrap_callback (fun (t:float) -> loop st' ai)

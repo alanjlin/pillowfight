@@ -20,7 +20,8 @@ type st = {
   mutable time: float;
   mutable last_time_of_pillow_spawn: float;
   mutable random_time: float;
-  game_start: float
+  game_start: float;
+  mutable game_over: bool;
 }
 
 type move = {
@@ -81,3 +82,5 @@ val init_pillow: pillow
 val init_mcup: girl
 
 val init_soap: girl
+
+val highest_score: girl -> girl -> girl -> string

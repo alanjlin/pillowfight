@@ -139,6 +139,58 @@ let draw_time context time =
   let wipe context =
     context##clearRect (0., 0., _BGSIZE, _BGSIZE)
 
+let mcup_win context =
+  wipe context;
+  let img = (Dom_html.createImg Dom_html.document) in
+  img##src <- (Js.string "./pics/background.png");
+  context##drawImage_full(img, 0., 0., _BGSIZE, _BGSIZE,
+                        0., 0., _BGSIZE, _BGSIZE);
+  context##fillStyle <- Js.string "black";
+  context##font <- Js.string "30px 'Magical'";
+  context##textAlign <- Js.string "center";
+  context##fillText ((Js.string "Margarinecup won!"), _BGSIZE/.2., _BGSIZE/.2.);
+  context##fillText ((Js.string "Refresh the page to play again!"),
+                     _BGSIZE/.2., _BGSIZE/.2. +. 50.)
+
+let bloom_win context =
+  wipe context;
+  let img = (Dom_html.createImg Dom_html.document) in
+  img##src <- (Js.string "./pics/background.png");
+  context##drawImage_full(img, 0., 0., _BGSIZE, _BGSIZE,
+                          0., 0., _BGSIZE, _BGSIZE);
+  context##fillStyle <- Js.string "black";
+  context##font <- Js.string "30px 'Magical'";
+  context##textAlign <- Js.string "center";
+  context##fillText ((Js.string "Bloom won!"), _BGSIZE/.2., _BGSIZE/.2.);
+  context##fillText ((Js.string "Refresh the page to play again!"),
+                     _BGSIZE/.2., _BGSIZE/.2. +. 50.)
+
+let soap_win context =
+  wipe context;
+  let img = (Dom_html.createImg Dom_html.document) in
+  img##src <- (Js.string "./pics/background.png");
+  context##drawImage_full(img, 0., 0., _BGSIZE, _BGSIZE,
+                        0., 0., _BGSIZE, _BGSIZE);
+  context##fillStyle <- Js.string "black";
+  context##font <- Js.string "30px 'Magical'";
+  context##textAlign <- Js.string "center";
+  context##fillText ((Js.string "Soap won!"), _BGSIZE/.2., _BGSIZE/.2.);
+  context##fillText ((Js.string "Refresh the page to play again!"),
+                     _BGSIZE/.2., _BGSIZE/.2. +. 50.)
+
+let tie_win context =
+  wipe context;
+  let img = (Dom_html.createImg Dom_html.document) in
+  img##src <- (Js.string "./pics/background.png");
+  context##drawImage_full(img, 0., 0., _BGSIZE, _BGSIZE,
+                      0., 0., _BGSIZE, _BGSIZE);
+  context##fillStyle <- Js.string "black";
+  context##font <- Js.string "30px 'Magical'";
+  context##textAlign <- Js.string "center";
+  context##fillText ((Js.string "Aww... it was a tie!"), _BGSIZE/.2., _BGSIZE/.2.);
+  context##fillText ((Js.string "Refresh the page to play again!"),
+                     _BGSIZE/.2., _BGSIZE/.2. +. 50.)
+
 (* effects: [draw_state context state] draws the following items based on info
    from [state]:
    - background

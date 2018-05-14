@@ -33,3 +33,11 @@ returns: nothing*)
 (* val game_over_display : unit -> unit *)
 
 val draw_state: Dom_html.canvasRenderingContext2D Js.t -> st -> unit
+
+val bloom_win: Dom_html.canvasRenderingContext2D Js.t -> unit
+
+val mcup_win: Dom_html.canvasRenderingContext2D Js.t -> unit
+
+val soap_win: Dom_html.canvasRenderingContext2D Js.t -> unit
+
+val tie_win: Dom_html.canvasRenderingContext2D Js.t -> unit
