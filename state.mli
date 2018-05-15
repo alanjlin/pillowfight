@@ -1,4 +1,5 @@
 open Actors
+
 (* The [state] of the game represents all the variables and information
 * necessary for any instance of gameplay. [state] is essential in
 * gameplay because it is responsible for keeping track of every
