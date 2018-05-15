@@ -96,8 +96,8 @@ let draw_bg context =
 let draw_scoreboard context =
   let img = (Dom_html.createImg Dom_html.document) in
   img##src <- (Js.string "./pics/scoreboard.png");
-  context##drawImage_full(img, 0., 0., _SBWIDTH, _SBHEIGHT,
-                          _BGSIZE, 0., _SBWIDTH,  _SBHEIGHT)
+  context##drawImage_full(img, 0., 0., _SBWIDTH -. 2., _SBHEIGHT,
+                          _BGSIZE -. 2., 0., _SBWIDTH -. 2.,  _SBHEIGHT)
 
 (* effects: [draw_score context score name] draws [score] of the girl
    represented by [name] onto [context].
