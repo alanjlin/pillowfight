@@ -8,10 +8,10 @@ let rec update_all context =
     if st'.game_over = true then
       begin
         match State.highest_score st'.mcup st'.bloom st'.soap with
-        | "mcup" -> Display.mcup_win context; exit 0
-        | "bloom" -> Display.bloom_win context; exit 0
-        | "soap" -> Display.soap_win context; exit 0
-        | "tie" -> Display.tie_win context; exit 0
+        | "mcup" -> Display.draw_winscreen context "mcup"; exit 0
+        | "bloom" -> Display.draw_winscreen context "bloom"; exit 0
+        | "soap" -> Display.draw_winscreen context "soap"; exit 0
+        | "tie" -> Display.draw_winscreen context "tie"; exit 0
         | _ -> print_endline "failed"
       end
     else
